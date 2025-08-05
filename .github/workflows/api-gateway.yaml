@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'api-gateway/**'           # Only trigger if files in api-gateway/ change
-      - '.github/workflows/api-gateway.yml' # Optional: trigger if this workflow changes
 
 jobs:
   build:
