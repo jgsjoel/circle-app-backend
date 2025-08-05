@@ -1,0 +1,38 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/users/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: jKHjJLTBxQiJy3K2a6LBSEE2QH6hBK51QBUD9AJjmCRnXwNd3TCUMqZmwuyuDxrtD21CfuHxf4yJvdyiwnpMq6P8uD
+  exp:
+    time: 2592000000
+  issuer: Chat-App
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
