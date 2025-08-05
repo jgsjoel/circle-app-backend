@@ -1,0 +1,56 @@
+name: Build and Deploy API Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api-gateway/**'           # Only trigger if files in api-gateway/ change
+      - '.github/workflows/api-gateway.yml' # Optional: trigger if this workflow changes
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3. Build Docker image for API Gateway
+      - name: Build Docker image
+        run: docker build -t joelgallan/api-gateway:latest ./api-gateway
+
+      # 4. Push Docker image
+      - name: Push Docker image
+        run: docker push joelgallan/api-gateway:latest
+
+      # 5. Upload docker-compose.yaml to VPS
+      - name: Upload docker-compose.yaml to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "./docker-compose.yaml"
+          target: "~/apps/circle-app/"
+
+      # 6. Deploy API Gateway on VPS
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd ~/apps/circle-app
+            docker compose pull api-gateway
+            docker compose up -d api-gateway
+            docker image prune -f
