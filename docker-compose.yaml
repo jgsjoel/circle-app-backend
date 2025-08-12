@@ -5,8 +5,8 @@ networks:
     driver: bridge
 
 services:
-  redis:
-    image: redis:7-alpine
+  redis-service:
+    image: redis:alpine3.22
     container_name: redis-service
     restart: always
     ports:
@@ -32,6 +32,8 @@ services:
     image: joelgallan/api-gateway:latest
     container_name: api-gateway
     restart: always
+    depends_on:
+      - service-registry
     ports:
       - "8001:8001"
     networks:
@@ -41,6 +43,8 @@ services:
     image: joelgallan/user-service:latest
     container_name: user-service
     restart: always
+    depends_on:
+      - service-registry
     ports:
       - "8080:8080"
     networks:
@@ -55,6 +59,8 @@ services:
     networks:
       - app-network
     depends_on:
-      redis:
+      service-registry:
+        condition: service_started
+      redis-service:
         condition: service_healthy
 
