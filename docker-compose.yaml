@@ -13,6 +13,11 @@ services:
       - "6379:6379"
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   service-registry:
     image: joelgallan/service-registry:latest
@@ -31,6 +36,9 @@ services:
       - "8001:8001"
     networks:
       - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
 
   user-service:
     image: joelgallan/user-service:latest
