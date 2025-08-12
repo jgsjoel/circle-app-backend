@@ -7,7 +7,7 @@ networks:
 services:
   redis:
     image: redis:7-alpine
-    container_name: redis
+    container_name: redis-service
     restart: always
     ports:
       - "6379:6379"
@@ -36,9 +36,6 @@ services:
       - "8001:8001"
     networks:
       - app-network
-    depends_on:
-      redis:
-        condition: service_healthy
 
   user-service:
     image: joelgallan/user-service:latest
@@ -57,4 +54,7 @@ services:
       - "8082:8082"
     networks:
       - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
 
