@@ -7,8 +7,6 @@ services:
     restart: always
     ports:
       - "6379:6379"
-    networks:
-      - app-network
 
   service-registry:
     image: joelgallan/service-registry:latest
@@ -16,8 +14,6 @@ services:
     restart: always
     ports:
       - "8761:8761"
-    networks:
-      - app-network
 
   api-gateway:
     image: joelgallan/api-gateway:latest
@@ -25,8 +21,6 @@ services:
     restart: always
     ports:
       - "8001:8001"
-    networks:
-      - app-network
 
   user-service:
     image: joelgallan/user-service:latest
@@ -34,8 +28,6 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    networks:
-      - app-network
 
   auth-service:
     image: joelgallan/auth-service:latest
@@ -43,9 +35,4 @@ services:
     restart: always
     ports:
       - "8082:8082"
-    networks:
-      - app-network
 
-networks:
-  app-network:
-    driver: bridge
