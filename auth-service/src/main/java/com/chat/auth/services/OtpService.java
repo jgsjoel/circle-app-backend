@@ -33,10 +33,13 @@ public class OtpService {
     private String messageTemplate;
     @Value("${otp.sender-id}")
     private String senderId;
+    @Value("${spring.redis.host}")
+    private String host;
 
     @PostConstruct
     public void init() {
         System.out.println("otp.ttl loaded: " + otpTtl);
+        System.out.println("redis host: "+host);
     }
 
 
