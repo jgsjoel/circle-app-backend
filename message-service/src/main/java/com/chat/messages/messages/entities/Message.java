@@ -1,15 +1,13 @@
 package com.chat.messages.messages.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,15 +16,25 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message {
 
     @Id
     private String id;
     private String chatId;
-    private String content;
+    private String message;
     private Boolean isRead;
     private String fromId;
     private LocalDateTime sentAt;
+
+    @OneToMany(
+            mappedBy = "message",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<MediaFile> mediaFiles = new ArrayList<>();  // ✅ renamed
 
     @PrePersist
     public void prePersist() {
@@ -36,5 +44,4 @@ public class Message {
         sentAt = LocalDateTime.now();
         isRead = false;
     }
-
 }

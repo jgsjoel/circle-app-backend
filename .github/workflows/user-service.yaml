@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'api-gateway/**'
+      - 'user-service/**'
 
 jobs:
   build:
@@ -25,13 +25,13 @@ jobs:
 
       # 3. Build Docker image for API Gateway
       - name: Build Docker image
-        run: docker build -t joelgallan/api-gateway:latest ./api-gateway
+        run: docker build -t joelgallan/user-service:latest ./user-service
 
       # 4. Push Docker image
       - name: Push Docker image
-        run: docker push joelgallan/api-gateway:latest
+        run: docker push joelgallan/user-service:latest
 
-      # 5. Deploy API Gateway on VPS
+      # 5. Deploy user service on VPS
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -40,6 +40,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ~/apps/circle-app
-            docker compose pull api-gateway
-            docker compose up -d api-gateway
+            docker compose pull user-service
+            docker compose up -d user-service
             docker image prune -f

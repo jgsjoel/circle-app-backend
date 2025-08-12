@@ -4,6 +4,7 @@ import com.chat.auth.dtos.RequestDto;
 import com.chat.auth.dtos.UserDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -23,11 +24,12 @@ public class UserService {
                 .bodyToMono(UserDto.class);
     }
 
-    public Mono<UserDto> getUserById(String id){
+    public Mono<UserDto> getUserById(String id) {
         return webClient.get()
-                .uri("/users/{id}",id)
+                .uri("/users/{id}", id)
                 .retrieve()
-                .bodyToMono(UserDto.class);
+                .bodyToMono(UserDto.class)
+                .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());
     }
 
 

@@ -1,0 +1,38 @@
+name: Sync Docker Compose to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker-compose.yaml'
+
+jobs:
+  sync-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Upload docker-compose.yaml to VPS (replace if exists, add if not)
+      - name: Upload docker-compose.yaml to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "./docker-compose.yaml"
+          target: "~/apps/circle-app/"
+          overwrite: true
+
+      # 3. (Optional) Verify file exists on VPS
+      - name: Verify file on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            ls -l ~/apps/circle-app/docker-compose.yaml

@@ -1,7 +1,5 @@
 package com.chat.chat;
 
-import com.chat.chat.entities.ChatParticipants;
-import com.chat.chat.enums.Role;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

@@ -31,12 +31,12 @@ public class UserController {
 
     //works
     @GetMapping("/{id}")
-    public ResponseEntity<?> isUserExistent(@PathVariable String id){
+    public ResponseEntity<?> isUserById(@PathVariable String id){
         User user = userService.getUserById(id);
         if (user != null){
             return new ResponseEntity<>(UserDtoMapper.toUserDto(user),HttpStatus.OK);
         }else{
-            return new ResponseEntity<>("No Such User",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("No Such User",HttpStatus.NOT_FOUND);
         }
     }
 

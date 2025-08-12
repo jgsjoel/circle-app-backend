@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatParticipants {
+public class ChatParticipant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

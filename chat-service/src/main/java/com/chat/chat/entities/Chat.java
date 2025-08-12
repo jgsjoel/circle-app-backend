@@ -25,15 +25,11 @@ public class Chat {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "chat",cascade = CascadeType.ALL)
-    private List<ChatParticipants> chatParticipants;
+    private List<ChatParticipant> chatParticipants;
 
     @PrePersist
     public void prePersist() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
         createdAt = LocalDateTime.now();
-        isGroup = false;
     }
 
 
