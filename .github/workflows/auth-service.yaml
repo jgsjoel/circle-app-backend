@@ -32,14 +32,14 @@ jobs:
         run: docker push joelgallan/auth-service:latest
 
       # 5. Deploy auth service on VPS
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd ~/apps/circle-app
-            docker compose pull auth-service
-            docker compose up -d auth-service
-            docker image prune -f
+#      - name: Deploy to VPS
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.VPS_HOST }}
+#          username: ${{ secrets.VPS_USER }}
+#          key: ${{ secrets.VPS_SSH_KEY }}
+#          script: |
+#            cd ~/apps/circle-app
+#            docker compose pull auth-service
+#            docker compose up -d auth-service
+#            docker image prune -f

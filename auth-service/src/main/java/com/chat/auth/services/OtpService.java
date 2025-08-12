@@ -33,13 +33,13 @@ public class OtpService {
     private String messageTemplate;
     @Value("${otp.sender-id}")
     private String senderId;
-    @Value("${spring.redis.host}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
     @PostConstruct
     public void init() {
         System.out.println("otp.ttl loaded: " + otpTtl);
-        System.out.println("redis host: "+host);
+        System.out.println("spring data redis host: "+host);
     }
 
 
@@ -50,6 +50,7 @@ public class OtpService {
 
     public void saveOtp(String phoneNumber, String otp) {
         String key = buildKey(phoneNumber);
+        System.out.println("save otp got triggered");
         redisTemplate.opsForValue().set(key, otp, otpTtl, TimeUnit.MINUTES);
     }
 

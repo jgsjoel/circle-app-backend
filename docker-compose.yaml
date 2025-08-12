@@ -19,37 +19,37 @@ services:
       timeout: 3s
       retries: 5
 
-  service-registry:
-    image: joelgallan/service-registry:latest
-    container_name: service-registry
-    restart: always
-    ports:
-      - "8761:8761"
-    networks:
-      - app-network
-
-  api-gateway:
-    image: joelgallan/api-gateway:latest
-    container_name: api-gateway
-    restart: always
-    depends_on:
-      - service-registry
-    ports:
-      - "8001:8001"
-    networks:
-      - app-network
-
-  user-service:
-    image: joelgallan/user-service:latest
-    container_name: user-service
-    restart: always
-    depends_on:
-      - service-registry
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-
+#  service-registry:
+#    image: joelgallan/service-registry:latest
+#    container_name: service-registry
+#    restart: always
+#    ports:
+#      - "8761:8761"
+#    networks:
+#      - app-network
+#
+#  api-gateway:
+#    image: joelgallan/api-gateway:latest
+#    container_name: api-gateway
+#    restart: always
+#    depends_on:
+#      - service-registry
+#    ports:
+#      - "8001:8001"
+#    networks:
+#      - app-network
+#
+#  user-service:
+#    image: joelgallan/user-service:latest
+#    container_name: user-service
+#    restart: always
+#    depends_on:
+#      - service-registry
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - app-network
+#
   auth-service:
     image: joelgallan/auth-service:latest
     container_name: auth-service   # fixed duplicate container_name
@@ -59,8 +59,8 @@ services:
     networks:
       - app-network
     depends_on:
-      service-registry:
-        condition: service_started
+#      service-registry:
+#        condition: service_started
       redis-service:
         condition: service_healthy
 
