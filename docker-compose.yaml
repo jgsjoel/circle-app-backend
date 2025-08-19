@@ -20,6 +20,15 @@ services:
     volumes:
       - redis-data:/data
 
+  service-registry:
+    image: joelgallan/service-registry:latest
+    container_name: service-registry
+    restart: always
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+
   auth-service:
     image: joelgallan/auth-service:latest
     container_name: auth-service
@@ -31,18 +40,16 @@ services:
     environment:
       # These environment variables override the defaults in application.properties
       - SPRING_DATA_REDIS_HOST=redis-service
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE_TIME=${JWT_EXP_TIME}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - OTP_ENDPOINT=${OTP_ENDPOINT}
+      - OTP_AUTH_TOKEN=${OTP_AUTH_TOKEN}
+      - OTP_MESSAGE_TEMPLATE=${OTP_MESSAGE_TEMPLATE}
+      - OTP_SENDER_ID=${OTP_SENDER_ID}
     depends_on:
       redis-service:
         condition: service_healthy
-
-  service-registry:
-    image: joelgallan/service-registry:latest
-    container_name: service-registry
-    restart: always
-    ports:
-      - "8761:8761"
-    networks:
-      - app-network
 
   api-gateway:
     image: joelgallan/api-gateway:latest
@@ -65,6 +72,13 @@ services:
       - "8080:8080"
     networks:
       - app-network
+    environment:
+      - SPRING_DATASOURCE_URL=${USER_SERVICE_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${USER_SERVICE_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${USER_SERVICE_DATASOURCE_PASSWORD}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
 
 volumes:
   redis-data:
