@@ -40,6 +40,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ~/apps/circle-app
+            docker compose stop api-gateway
+            docker compose rm -f api-gateway
             docker compose pull api-gateway
             docker compose up -d api-gateway
             docker image prune -f
