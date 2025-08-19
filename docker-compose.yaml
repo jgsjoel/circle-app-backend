@@ -37,16 +37,8 @@ services:
       - "8082:8082"
     networks:
       - app-network
-    environment:
-      # These environment variables override the defaults in application.properties
-      - SPRING_DATA_REDIS_HOST=redis-service
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRE_TIME=${JWT_EXP_TIME}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - OTP_ENDPOINT=${OTP_ENDPOINT}
-      - OTP_AUTH_TOKEN=${OTP_AUTH_TOKEN}
-      - OTP_MESSAGE_TEMPLATE=${OTP_MESSAGE_TEMPLATE}
-      - OTP_SENDER_ID=${OTP_SENDER_ID}
+    env_file:
+      - .env
     depends_on:
       redis-service:
         condition: service_healthy
@@ -61,6 +53,9 @@ services:
       - "8001:8001"
     networks:
       - app-network
+    env_file:
+      - .env
+
 
   user-service:
     image: joelgallan/user-service:latest
@@ -72,13 +67,8 @@ services:
       - "8080:8080"
     networks:
       - app-network
-    environment:
-      - SPRING_DATASOURCE_URL=${USER_SERVICE_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${USER_SERVICE_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${USER_SERVICE_DATASOURCE_PASSWORD}
-      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+    env_file:
+      - .env
 
 volumes:
   redis-data:
