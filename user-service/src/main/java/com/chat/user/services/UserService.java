@@ -55,4 +55,29 @@ public class UserService {
         }
     }
 
+    public ContactListDto getUsersByContactNumber(ContactListDto input) {
+        // Extract all phone numbers from request
+        List<String> phoneNumbers = input.getContacts()
+                .stream()
+                .map(ContactDto::getPhone)
+                .toList();
+
+        // Find all users that exist in DB
+        List<User> users = userRepo.findByMobileIn(phoneNumbers);
+
+        // Convert to ContactDto (only existing users)
+        List<ContactDto> matchedContacts = users.stream().map(user -> {
+            ContactDto dto = new ContactDto();
+            dto.setPhone(user.getMobile());
+            dto.setName(user.getName()); // depends on your User entity
+            dto.setPublicId(user.getId()); // or another unique field
+            return dto;
+        }).toList();
+
+        // Wrap in ContactListDto
+        ContactListDto result = new ContactListDto();
+        result.setContacts(matchedContacts);
+
+        return result;
+    }
 }

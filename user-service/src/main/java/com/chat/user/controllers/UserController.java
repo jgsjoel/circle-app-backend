@@ -102,6 +102,34 @@ public class UserController {
 
     }
 
+    @PostMapping("/sync-contacts")
+    public ResponseEntity<byte[]> syncContacts(@RequestBody byte[] binaryData) {
+        String json = new String(binaryData, StandardCharsets.UTF_8);
+        ObjectMapper mapper = new ObjectMapper();
+        ContactListDto contactListDto;
+        try {
+            contactListDto = mapper.readValue(json, ContactListDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Service returns matched contacts
+        ContactListDto matchedContacts = userService.getUsersByContactNumber(contactListDto);
+
+        try {
+            // Convert back to JSON bytes
+            byte[] responseBytes = mapper.writeValueAsBytes(matchedContacts);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE) // binary response
+                    .body(responseBytes);
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
 
 

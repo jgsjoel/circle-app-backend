@@ -15,4 +15,7 @@ public interface UserRepo extends JpaRepository<User,String> {
 
     @Override
     void deleteById(String id);
+
+    List<User> findByMobileIn(List<String> mobiles);
+
 }
