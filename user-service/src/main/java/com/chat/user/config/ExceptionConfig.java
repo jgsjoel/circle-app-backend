@@ -1,6 +1,7 @@
 package com.chat.user.config;
 
 import com.chat.user.exceptions.NoSuchEntityException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

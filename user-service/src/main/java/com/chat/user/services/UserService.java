@@ -1,5 +1,7 @@
 package com.chat.user.services;
 
+import com.chat.user.dto.ContactDto;
+import com.chat.user.dto.ContactListDto;
 import com.chat.user.dto.UserDto;
 import com.chat.user.entities.User;
 import com.chat.user.exceptions.NoSuchEntityException;
@@ -8,7 +10,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -56,28 +62,41 @@ public class UserService {
     }
 
     public ContactListDto getUsersByContactNumber(ContactListDto input) {
-        // Extract all phone numbers from request
-        List<String> phoneNumbers = input.getContacts()
-                .stream()
+        List<ContactDto> requestContacts = input.getContacts();
+
+        // Get all phone numbers
+        List<String> phoneNumbers = requestContacts.stream()
                 .map(ContactDto::getPhone)
                 .toList();
 
-        // Find all users that exist in DB
+        // Fetch users from DB
         List<User> users = userRepo.findByMobileIn(phoneNumbers);
 
-        // Convert to ContactDto (only existing users)
+        // Build matched contacts, replacing name with request name
         List<ContactDto> matchedContacts = users.stream().map(user -> {
             ContactDto dto = new ContactDto();
             dto.setPhone(user.getMobile());
-            dto.setName(user.getName()); // depends on your User entity
-            dto.setPublicId(user.getId()); // or another unique field
+            dto.setPublicId(user.getId());
+
+            // Find the request contact with the same phone
+            requestContacts.stream()
+                    .filter(c -> c.getPhone().equals(user.getMobile()))
+                    .findFirst()
+                    .ifPresent(c -> dto.setName(c.getName()));
+
+            // fallback to DB name if no match in request
+            if (dto.getName() == null) {
+                dto.setName(user.getName());
+            }
+
             return dto;
         }).toList();
 
-        // Wrap in ContactListDto
         ContactListDto result = new ContactListDto();
         result.setContacts(matchedContacts);
 
         return result;
     }
+
+
 }

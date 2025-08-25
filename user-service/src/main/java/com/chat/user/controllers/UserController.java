@@ -1,5 +1,7 @@
 package com.chat.user.controllers;
 
+import com.chat.user.dto.ContactDto;
+import com.chat.user.dto.ContactListDto;
 import com.chat.user.dto.ImageUploadDto;
 import com.chat.user.dto.UserDto;
 import com.chat.user.entities.Image;
@@ -11,13 +13,20 @@ import com.chat.user.mapper.UserDtoMapper;
 import com.chat.user.services.CloudinaryService;
 import com.chat.user.services.ImageService;
 import com.chat.user.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -104,28 +113,28 @@ public class UserController {
 
     @PostMapping("/sync-contacts")
     public ResponseEntity<byte[]> syncContacts(@RequestBody byte[] binaryData) {
-        String json = new String(binaryData, StandardCharsets.UTF_8);
-        ObjectMapper mapper = new ObjectMapper();
-        ContactListDto contactListDto;
         try {
-            contactListDto = mapper.readValue(json, ContactListDto.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+            String json = new String(binaryData, StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            System.out.println(json);
 
-        // Service returns matched contacts
-        ContactListDto matchedContacts = userService.getUsersByContactNumber(contactListDto);
+            // Parse as list first
+            List<ContactDto> contacts = mapper.readValue(json, new TypeReference<List<ContactDto>>() {});
+            System.out.println(json);
+            // Wrap in ContactListDto for your service
+            ContactListDto contactListDto = new ContactListDto();
+            contactListDto.setContacts(contacts);
 
-        try {
-            // Convert back to JSON bytes
+            ContactListDto matchedContacts = userService.getUsersByContactNumber(contactListDto);
+
             byte[] responseBytes = mapper.writeValueAsBytes(matchedContacts);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE) // binary response
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
                     .body(responseBytes);
 
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error converting JSON", e);
         }
     }
 
