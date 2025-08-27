@@ -44,4 +44,4 @@ jobs:
             docker compose rm -f api-gateway
             docker compose pull api-gateway
             docker compose up -d api-gateway
-            docker image prune -f
+            docker image prune -f || echo "Prune skipped"

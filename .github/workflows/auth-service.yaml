@@ -44,4 +44,4 @@ jobs:
             docker compose rm -f auth-service
             docker compose pull auth-service
             docker compose up -d auth-service
-            docker image prune -f
+            docker image prune -f || echo "Prune skipped"

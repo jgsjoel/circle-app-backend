@@ -44,4 +44,4 @@ jobs:
             docker compose rm -f user-service
             docker compose pull user-service
             docker compose up -d user-service
-            docker image prune -f
+            docker image prune -f || echo "Prune skipped"

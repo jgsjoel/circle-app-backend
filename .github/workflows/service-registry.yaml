@@ -44,4 +44,4 @@ jobs:
             docker compose rm -f service-registry
             docker compose pull service-registry
             docker compose up -d service-registry
-            docker image prune -f
+            docker image prune -f || echo "Prune skipped"
