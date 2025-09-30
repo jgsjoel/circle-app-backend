@@ -4,6 +4,79 @@ networks:
 
 services:
 
+  rabbitmq:
+    container_name: 'rabbit-mq'
+    image: rabbitmq:management
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+      -  'RABBITMQ_PLUGINS_ENABLE=rabbitmq_stomp,rabbitmq_web_stomp'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+      - '61613:61613'
+      - '15674:15674'
+
+#  user_service_db:
+#    image: postgres:15-alpine
+#    container_name: user_service_db
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: users
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - app-network
+#    volumes:
+#      - pg-data:/var/lib/postgresql/data
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d users" ]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+#
+#  chat_service_db:
+#    image: postgres:15-alpine
+#    container_name: chat_service_db
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: chat
+#    ports:
+#      - "5433:5432"
+#    networks:
+#      - app-network
+#    volumes:
+#      - pg-data:/var/lib/postgresql/data
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d users" ]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+#
+#  message_service_db:
+#    image: postgres:15-alpine
+#    container_name: message_service_db
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: message
+#    ports:
+#      - "5434:5432"
+#    networks:
+#      - app-network
+#    volumes:
+#      - pg-data:/var/lib/postgresql/data
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d users" ]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+##
   redis-service:
     image: redis:alpine3.22
     container_name: redis-service
@@ -19,57 +92,70 @@ services:
       retries: 5
     volumes:
       - redis-data:/data
-
-  service-registry:
-    image: joelgallan/service-registry:latest
-    container_name: service-registry
-    restart: always
-    ports:
-      - "8761:8761"
-    networks:
-      - app-network
-
-  auth-service:
-    image: joelgallan/auth-service:latest
-    container_name: auth-service
-    restart: always
-    ports:
-      - "8082:8082"
-    networks:
-      - app-network
-    env_file:
-      - .env
-    depends_on:
-      redis-service:
-        condition: service_healthy
-
-  api-gateway:
-    image: joelgallan/api-gateway:latest
-    container_name: api-gateway
-    restart: always
-    depends_on:
-      - service-registry
-    ports:
-      - "8001:8001"
-    networks:
-      - app-network
-    env_file:
-      - .env
-
-
-  user-service:
-    image: joelgallan/user-service:latest
-    container_name: user-service
-    restart: always
-    depends_on:
-      - service-registry
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-    env_file:
-      - .env
-
+#
+#  service-registry:
+#    image: joelgallan/service-registry:latest
+#    container_name: service-registry
+#    restart: always
+#    ports:
+#      - "8761:8761"
+#    networks:
+#      - app-network
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://localhost:8761/ || exit 1" ]
+#      interval: 5s
+#      timeout: 3s
+#      retries: 5
+#
+#
+#  auth-service:
+#    image: joelgallan/auth-service:latest
+#    container_name: auth-service
+#    restart: always
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - app-network
+#    env_file:
+#      - .env
+#    depends_on:
+#      redis-service:
+#        condition: service_healthy
+#      service-registry:
+#        condition: service_healthy
+#
+#  api-gateway:
+#    image: joelgallan/api-gateway:latest
+#    container_name: api-gateway
+#    restart: always
+#    depends_on:
+#      redis-service:
+#        condition: service_healthy
+#    ports:
+#      - "8001:8001"
+#    networks:
+#      - app-network
+#    env_file:
+#      - .env
+#
+#
+#  user-service:
+#    image: joelgallan/user-service:latest
+#    container_name: user-service
+#    restart: always
+#    depends_on:
+#      redis-service:
+#        condition: service_healthy
+#      user_service_db:
+#        condition: service_healthy
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - app-network
+#    env_file:
+#      - .env
+#
 volumes:
   redis-data:
+#  pg-data:
 

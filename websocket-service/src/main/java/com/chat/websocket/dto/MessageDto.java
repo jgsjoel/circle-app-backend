@@ -1,13 +1,10 @@
-package com.chat.messages.messages.dto;
+package com.chat.websocket.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,14 +29,5 @@ public class MessageDto {
     private String messageType;
     @JsonProperty("media_url")
     private String mediaUrl;
-    private String mediaPublicId;
-    private String chatId;
-
-    @AssertTrue(message = "Either message or mediaUris must be provided")
-    public boolean isMessageOrMediaPresent() {
-        boolean hasMessage = message != null && !message.isBlank();
-        boolean hasMedia = mediaUrl != null && !mediaUrl.isEmpty();
-        return hasMessage || hasMedia;
-    }
 
 }

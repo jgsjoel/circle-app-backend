@@ -1,5 +1,6 @@
 package com.chat.messages.messages.entities;
 
+import com.chat.messages.messages.enums.MessageStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -23,7 +24,8 @@ public class Message {
     private String id;
     private String chatId;
     private String message;
-    private Boolean isRead;
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status;
     private String fromId;
     private LocalDateTime sentAt;
 
@@ -42,6 +44,5 @@ public class Message {
             id = UUID.randomUUID().toString();
         }
         sentAt = LocalDateTime.now();
-        isRead = false;
     }
 }
