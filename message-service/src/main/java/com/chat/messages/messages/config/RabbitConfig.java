@@ -22,9 +22,19 @@ public class RabbitConfig {
 
     public final static String UNDELIVERED_RESPONSE_QUEUE = "Undelivered.response";//listened by this message service
 
+    public final static String MESSAGE_STATUS_RESPONSE_QUEUE = "msgstat.response";//listened by this web socket service
+
+    public final static String MESSAGE_STATUS_PROCESS_QUEUE = "msgstat.request";//listened by this web socket service
+
+
     @Bean
     public DirectExchange chatExchange() {
         return new DirectExchange(MESSAGE_EXCHANGE);
+    }
+
+    @Bean
+    public Queue msgStatProcessQueue() {
+        return new Queue(MESSAGE_STATUS_PROCESS_QUEUE, false);
     }
 
     @Bean
@@ -51,6 +61,12 @@ public class RabbitConfig {
                 .with("undelivered.response");
     }
 
+    @Bean
+    public Binding bindingMsgStatRequestQueue(Queue msgStatProcessQueue, DirectExchange messageExchange) {
+        return BindingBuilder.bind(msgStatProcessQueue)
+                .to(messageExchange)
+                .with(MESSAGE_STATUS_PROCESS_QUEUE);
+    }
 
     @Bean
     public MessageConverter converter() {

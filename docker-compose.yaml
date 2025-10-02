@@ -16,6 +16,10 @@ services:
       - '15672:15672'
       - '61613:61613'
       - '15674:15674'
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
+
+#### databases ####
 
 #  user_service_db:
 #    image: postgres:15-alpine
@@ -76,7 +80,10 @@ services:
 #      interval: 5s
 #      timeout: 5s
 #      retries: 5
-##
+
+
+#####SERVICES#####
+
   redis-service:
     image: redis:alpine3.22
     container_name: redis-service

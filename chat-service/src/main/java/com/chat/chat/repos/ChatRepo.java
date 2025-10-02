@@ -1,4 +1,4 @@
-package repos;
+package com.chat.chat.repos;
 
 import com.chat.chat.entities.Chat;
 import org.springframework.data.jpa.repository.JpaRepository;

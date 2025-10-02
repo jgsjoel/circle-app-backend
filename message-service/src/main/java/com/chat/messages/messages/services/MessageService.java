@@ -1,8 +1,6 @@
 package com.chat.messages.messages.services;
 
-import com.chat.messages.messages.dto.MessageDto;
-import com.chat.messages.messages.dto.ChatResponseDto;
-import com.chat.messages.messages.dto.MsgSendRespDto;
+import com.chat.messages.messages.dto.*;
 import com.chat.messages.messages.entities.MediaFile;
 import com.chat.messages.messages.entities.Message;
 import com.chat.messages.messages.enums.MessageStatus;
@@ -10,11 +8,13 @@ import com.chat.messages.messages.mapper.MessageDtoMapper;
 import com.chat.messages.messages.repository.MediaFileRepo;
 import com.chat.messages.messages.repository.MessageRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class MessageService {
 
     private MessageRepo messageRepo;
@@ -34,6 +34,12 @@ public class MessageService {
                 messageDto.getReceiverId()
         ).block();
 
+        if (chatResponseDto == null) {
+            log.warn("Empty Chat Response, skipping message. Sender: {}, Receiver: {}",
+                    messageDto.getSenderId(), messageDto.getReceiverId());
+            return null;
+        }
+
         Message message = new Message();
         message.setChatId(chatResponseDto.getChatId());
         message.setMessage(messageDto.getMessage());
@@ -48,7 +54,7 @@ public class MessageService {
             savedMediaFile = saveFileData(newMessage,messageDto.getMediaUrl(),messageDto.getMediaPublicId());
         }
 
-        return MessageDtoMapper.toDto(newMessage,savedMediaFile, chatResponseDto);
+        return MessageDtoMapper.toMsgRespDto(newMessage,savedMediaFile, chatResponseDto);
     }
 
 
@@ -58,6 +64,11 @@ public class MessageService {
         mediaFile.setPublicId(mediaPubId);
         mediaFile.setMessage(newMsg);
         return mediaFileRepo.save(mediaFile);
+    }
+
+    public MsgSendRespDto<MsgStatRespDto, MsgStatRespDto> updateStatus(MsgStatUpdate msgStatUpdate) {
+        //TODO: update the
+        return MessageDtoMapper.toMsgStatRespDto(msgStatUpdate);
     }
 
     //TODO: before getting signed url for images make sure that a chat is created

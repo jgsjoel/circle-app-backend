@@ -17,7 +17,7 @@ public class ChatService {
 
     public Mono<ChatResponseDto> getChatDetails(String senderID, String receiverID) {
         return webClient.get()
-                .uri("/sender/{senderId}/{receiverId}", senderID,receiverID)
+                .uri("/chat/get-create/{senderId}/{receiverId}", senderID,receiverID)
                 .retrieve()
                 .bodyToMono(ChatResponseDto.class)
                 .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());

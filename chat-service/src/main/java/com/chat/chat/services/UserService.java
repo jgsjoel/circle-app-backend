@@ -1,12 +1,15 @@
 package com.chat.chat.services;
 
 import com.chat.chat.dtos.UserDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final WebClient webClient;
@@ -20,7 +23,13 @@ public class UserService {
                 .uri("/users/{id}", id)
                 .retrieve()
                 .bodyToMono(UserDto.class)
-                .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                if (ex.getStatusCode() == HttpStatus.NOT_FOUND || ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                    log.warn("User not found or invalid ID: {}", id);
+                    return Mono.empty();
+                }
+                return Mono.error(ex);
+        });
     }
 
 

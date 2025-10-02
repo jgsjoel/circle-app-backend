@@ -7,21 +7,24 @@ import com.chat.chat.entities.ChatParticipant;
 import com.chat.chat.enums.Role;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import repos.ChatParticipantsRepo;
-import repos.ChatRepo;
+import com.chat.chat.repos.ChatParticipantsRepo;
+import com.chat.chat.repos.ChatRepo;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ChatService {
 
     private ChatRepo chatRepo;
     private ChatParticipantsRepo chatParticipantsRepo;
     private UserService userService;
-
 
     @Transactional
     public ChatResponseDto getOrCreatePrivateChat(String sender, String receiver) {
@@ -30,7 +33,8 @@ public class ChatService {
         UserDto receiverUser = userService.getUserById(receiver).block();
 
         if (senderUser == null || receiverUser == null) {
-            throw new IllegalArgumentException("One or both users do not exist");
+            log.warn("Invalid users: sender={}, receiver={}", sender, receiver);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "One or both users do not exist");
         }
 
         // Sort IDs so chatId is predictable
@@ -41,7 +45,7 @@ public class ChatService {
         List<ChatParticipant> chatParticipants = chatParticipantsRepo.findAllByUserId(firstID);
         String chatId = null;
         for (ChatParticipant chatParticipant : chatParticipants) {
-            if (chatParticipantsRepo.existByChatIdAndUserId(chatParticipant.getChat().getId(), secondID)) {
+            if (chatParticipantsRepo.existsByChatIdAndUserId(chatParticipant.getChat().getId(), secondID)) {
                 chatId = chatParticipant.getChat().getId();
                 break;
             }

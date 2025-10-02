@@ -25,10 +25,19 @@ public class RabbitMqConfig {
 
     public final static String UNDELIVERED_RESPONSE_QUEUE = "undelivered.response";//listened by this web socket service
 
+    public final static String MESSAGE_STATUS_RESPONSE_QUEUE = "msgstat.response";//listened by this web socket service
+
+    public final static String MESSAGE_STATUS_PROCESS_QUEUE = "msgstat.request";//listened by this web socket service
+
     @Bean
     public DirectExchange messageExchange() {
         return new DirectExchange(MESSAGE_EXCHANGE, true, false);
         // durable = true, autoDelete = false
+    }
+
+    @Bean
+    public Queue msgStatResponseQueue() {
+        return new Queue(MESSAGE_STATUS_RESPONSE_QUEUE, false);
     }
 
     @Bean
@@ -62,6 +71,12 @@ public class RabbitMqConfig {
         return new Jackson2JsonMessageConverter();
     }
 
+    @Bean
+    public Binding bindingMsgStatResponseQueue(Queue msgStatResponseQueue, DirectExchange messageExchange) {
+        return BindingBuilder.bind(msgStatResponseQueue)
+                .to(messageExchange)
+                .with(MESSAGE_STATUS_RESPONSE_QUEUE);
+    }
 
     @Bean
     public RabbitTemplate template(ConnectionFactory connectionFactory){

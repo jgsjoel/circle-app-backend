@@ -4,7 +4,7 @@ import com.chat.messages.messages.enums.MessageStatus;
 import lombok.Data;
 
 @Data
-public class SenderRespDto {
+public class MsgStatRespDto {
 
     private String pubMsgId;
     private MessageStatus messageStatus;
