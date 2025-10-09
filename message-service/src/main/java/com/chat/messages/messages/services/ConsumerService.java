@@ -33,23 +33,23 @@ public class ConsumerService {
         }
     }
 
-    @RabbitListener(queues = {RabbitConfig.MESSAGE_STATUS_PROCESS_QUEUE})
-    public void consumeMsgStat(MsgStatUpdate msgStatUpdate){
-        try {
-            MsgSendRespDto<MsgStatRespDto, MsgStatRespDto> msgSendRespDto = messageService.updateStatus(msgStatUpdate);
-            if (msgSendRespDto != null) {
-                publisherService.sendToMsgStatResponse(msgSendRespDto);
-            } else {
-                log.warn("No status response to send for Sender: {}, Receiver: {}",
-                        msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
-            }
-        } catch (IllegalArgumentException e) {
-            log.warn("Empty Chat Response, skipping message. Sender: {}, Receiver: {}",
-                    msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
-        } catch (Exception e) {
-            log.error("Unexpected error while processing message: {}", msgStatUpdate, e);
-        }
-    }
+//    @RabbitListener(queues = {RabbitConfig.MESSAGE_STATUS_PROCESS_QUEUE})
+//    public void consumeMsgStat(MsgStatUpdate msgStatUpdate){
+//        try {
+//            MsgSendRespDto<MsgStatRespDto, MsgStatRespDto> msgSendRespDto = messageService.updateStatus(msgStatUpdate);
+//            if (msgSendRespDto != null) {
+//                publisherService.sendToMsgStatResponse(msgSendRespDto);
+//            } else {
+//                log.warn("No status response to send for Sender: {}, Receiver: {}",
+//                        msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
+//            }
+//        } catch (IllegalArgumentException e) {
+//            log.warn("Empty Chat Response, skipping message. Sender: {}, Receiver: {}",
+//                    msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
+//        } catch (Exception e) {
+//            log.error("Unexpected error while processing message: {}", msgStatUpdate, e);
+//        }
+//    }
 
 
 }

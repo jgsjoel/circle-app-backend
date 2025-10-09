@@ -1,9 +1,6 @@
 package com.chat.user.controllers;
 
-import com.chat.user.dto.ContactDto;
-import com.chat.user.dto.ContactListDto;
-import com.chat.user.dto.ImageUploadDto;
-import com.chat.user.dto.UserDto;
+import com.chat.user.dto.*;
 import com.chat.user.entities.Image;
 import com.chat.user.entities.User;
 import com.chat.user.groups.Create;
@@ -136,6 +133,11 @@ public class UserController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error converting JSON", e);
         }
+    }
+
+    @GetMapping("last-seen/{id}")
+    public ResponseEntity<LastSeenDto> getLastSeen(@PathVariable String id){
+        return new ResponseEntity<LastSeenDto>(userService.getLastSeenByUserId(id),HttpStatus.OK);
     }
 
 

@@ -21,6 +21,7 @@ public class User {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime lastSeen;
 
     // One-to-One mapping to Image
     @OneToOne(cascade = CascadeType.ALL)
@@ -34,6 +35,7 @@ public class User {
         }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        lastSeen = LocalDateTime.now();
     }
 
     @PreUpdate

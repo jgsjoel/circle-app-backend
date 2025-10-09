@@ -2,10 +2,12 @@ package com.chat.user.services;
 
 import com.chat.user.dto.ContactDto;
 import com.chat.user.dto.ContactListDto;
+import com.chat.user.dto.LastSeenDto;
 import com.chat.user.dto.UserDto;
 import com.chat.user.entities.User;
 import com.chat.user.exceptions.NoSuchEntityException;
 import com.chat.user.repositories.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +99,26 @@ public class UserService {
 
         return result;
     }
+
+    public void updateLastSeen(LastSeenDto lastSeenDto) {
+        userRepo.findById(lastSeenDto.getUserId())
+                .ifPresent(user -> {
+                    user.setLastSeen(lastSeenDto.getLastSeen());
+                    userRepo.save(user);
+                });
+    }
+
+    public LastSeenDto getLastSeenByUserId(String userId) {
+        return userRepo.findById(userId)
+                .map(user -> {
+                    LastSeenDto lastSeenDto = new LastSeenDto();
+                    lastSeenDto.setLastSeen(user.getLastSeen());
+                    lastSeenDto.setUserId(userId);
+                    return lastSeenDto;
+                })
+                .orElse(null);
+    }
+
 
 
 }

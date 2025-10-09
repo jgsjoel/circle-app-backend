@@ -10,4 +10,8 @@ public class ReceiverRespDo {
     private String senderMobile;
     private String pubChatId;
 
+    private String mediaUrl;
+    private String mediaPublicId;
+    private String messageType;
+
 }

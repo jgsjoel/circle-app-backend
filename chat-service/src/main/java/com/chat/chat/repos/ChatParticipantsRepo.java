@@ -12,4 +12,5 @@ public interface ChatParticipantsRepo extends JpaRepository<ChatParticipant,Long
     List<ChatParticipant> findAllByUserId(String userId);
     boolean existsByChatIdAndUserId(String chatId,String second);
 
+
 }

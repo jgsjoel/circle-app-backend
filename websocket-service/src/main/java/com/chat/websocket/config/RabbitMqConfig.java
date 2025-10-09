@@ -29,10 +29,19 @@ public class RabbitMqConfig {
 
     public final static String MESSAGE_STATUS_PROCESS_QUEUE = "msgstat.request";//listened by this web socket service
 
+    public static final String LAST_SEEN_EXCHANGE = "lstSeen.exchange";
+
+    public final static String LAST_SEEN_QUEUE = "lstSeen.process";
+
     @Bean
     public DirectExchange messageExchange() {
         return new DirectExchange(MESSAGE_EXCHANGE, true, false);
         // durable = true, autoDelete = false
+    }
+
+    @Bean
+    public DirectExchange lstSeenExchange() {
+        return new DirectExchange(LAST_SEEN_EXCHANGE);
     }
 
     @Bean

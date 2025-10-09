@@ -24,9 +24,12 @@ public class Message {
     private String id;
     private String chatId;
     private String message;
+
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
+
     private String fromId;
+    private String senderMobile;
     private LocalDateTime sentAt;
 
     @OneToMany(
@@ -36,13 +39,21 @@ public class Message {
             fetch = FetchType.LAZY
     )
     @JsonManagedReference
-    private List<MediaFile> mediaFiles = new ArrayList<>();  // ✅ renamed
+    private List<MediaFile> mediaFiles = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "message",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonManagedReference
+    private List<Recipient> recipients = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
+        if (id == null) id = UUID.randomUUID().toString();
         sentAt = LocalDateTime.now();
     }
 }
+

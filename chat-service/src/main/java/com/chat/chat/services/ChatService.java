@@ -84,6 +84,32 @@ public class ChatService {
     }
 
 
-
-
+//    public void getChatByUserId(String userId) {
+//        List<ChatParticipant> participants = chatParticipantsRepo.findAllByUserId(userId);
+//
+//        return participants.stream()
+//                .map(participant -> {
+//                    Chat chat = participant.getChat();
+//
+//                    // Get the "other" user in a private chat
+//                    String otherUserId = chatParticipantsRepo.findAllByChatId(chat.getId())
+//                            .stream()
+//                            .map(ChatParticipant::getUserId)
+//                            .filter(id -> !id.equals(userId))
+//                            .findFirst()
+//                            .orElse(null);
+//
+//                    UserDto otherUser = (otherUserId != null) ? userService.getUserById(otherUserId).block() : null;
+//
+//                    ChatResponseDto dto = new ChatResponseDto();
+//                    dto.setChatId(chat.getId());
+//                    dto.setSenderID(userId);
+//                    dto.setReceiverId(otherUserId);
+//                    dto.setSenderMobile(otherUser != null ? otherUser.getMobile() : null);
+//
+//                    return dto;
+//                })
+//                .toList();
+//
+//    }
 }

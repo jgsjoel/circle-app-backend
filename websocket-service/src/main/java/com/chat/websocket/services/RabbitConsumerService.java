@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ConsumerService {
+public class RabbitConsumerService {
 
     private SimpMessagingTemplate simpMessagingTemplate;
 

@@ -1,6 +1,7 @@
 package com.chat.websocket.services;
 
 import com.chat.websocket.config.RabbitMqConfig;
+import com.chat.websocket.dto.LastSeenDto;
 import com.chat.websocket.dto.MessageDto;
 import com.chat.websocket.dto.MsgStatUpdate;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class PublisherService {
+public class RabbitPublisherService {
 
     RabbitTemplate rabbitTemplate;
 
@@ -24,6 +25,12 @@ public class PublisherService {
         System.out.println("updateMsgStatus triggered");
         rabbitTemplate.convertAndSend(RabbitMqConfig.MESSAGE_EXCHANGE,RabbitMqConfig.MESSAGE_STATUS_PROCESS_QUEUE,msgStatUpdate);
     }
+
+    public void updateLastSeen(LastSeenDto lastSeenDto){
+        rabbitTemplate.convertAndSend(RabbitMqConfig.LAST_SEEN_EXCHANGE,RabbitMqConfig.LAST_SEEN_QUEUE,lastSeenDto);
+    }
+
+
 
 
 }

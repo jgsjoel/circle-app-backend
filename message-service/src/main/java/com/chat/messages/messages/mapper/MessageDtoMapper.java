@@ -17,11 +17,13 @@ public class MessageDtoMapper {
         receiverRespDo.setMessage(message.getMessage());
         receiverRespDo.setSenderId(message.getFromId());
         receiverRespDo.setPubChatId(message.getChatId());
-        receiverRespDo.setSenderMobile(chatResponseDto.getSenderMobile());
+        String senderMobile = chatResponseDto != null ? chatResponseDto.getSenderMobile() : null;
+        receiverRespDo.setSenderMobile(senderMobile);
 
         MsgSendRespDto msgSendRespDto = new MsgSendRespDto();
         msgSendRespDto.setSenderId(message.getFromId());
-        msgSendRespDto.setReceiverId(chatResponseDto.getReceiverId());
+        String receiverId = chatResponseDto != null ? chatResponseDto.getReceiverId() : null;
+        msgSendRespDto.setReceiverId(receiverId);
         msgSendRespDto.setSender(senderRespDto);
         msgSendRespDto.setReceiver(receiverRespDo);
 

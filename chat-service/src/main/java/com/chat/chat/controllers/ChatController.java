@@ -25,5 +25,10 @@ public class ChatController {
         return new ResponseEntity<ChatResponseDto>(chatService.getOrCreatePrivateChat(senderId,receiverId), HttpStatus.OK);
     }
 
+//    @GetMapping()
+//    public ResponseEntity<?> getChatsByUserId(String userId){
+//        chatService.getChatByUserId(userId);
+//    }
+
 
 }
