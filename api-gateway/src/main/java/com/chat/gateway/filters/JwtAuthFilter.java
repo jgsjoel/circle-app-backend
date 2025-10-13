@@ -22,28 +22,37 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
+        String upgradeHeader = exchange.getRequest().getHeaders().getFirst("Upgrade");
 
-        // Allow unauthenticated paths
+        // Skip for auth/public routes
         if (path.startsWith("/auth") || path.startsWith("/public")) {
             return chain.filter(exchange);
         }
 
-        // Validate JWT
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String token = null;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
+        // If it's a WebSocket handshake
+        if ("websocket".equalsIgnoreCase(upgradeHeader)) {
+            token = exchange.getRequest().getQueryParams().getFirst("token");
+        } else {
+            // Standard HTTP request
+            String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+            }
         }
 
-        String token = authHeader.substring(7);
+        if (token == null) {
+            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing JWT token"));
+        }
 
         if (!jwtUtil.validateToken(token)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token"));
         }
 
         Claims claims = jwtUtil.getClaims(token);
 
-        // Inject user ID as header to downstream services
+        // Inject user id into header
         ServerWebExchange mutatedExchange = exchange.mutate()
                 .request(exchange.getRequest().mutate()
                         .header("X-User-Id", claims.getSubject())

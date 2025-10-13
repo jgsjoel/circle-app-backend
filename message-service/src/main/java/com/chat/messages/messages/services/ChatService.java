@@ -1,6 +1,6 @@
 package com.chat.messages.messages.services;
 
-import com.chat.messages.messages.dto.ChatResponseDto;
+import com.chat.messages.messages.dto.messages.ChatResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;

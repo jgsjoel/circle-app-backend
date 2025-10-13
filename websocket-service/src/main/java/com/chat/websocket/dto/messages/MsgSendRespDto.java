@@ -1,4 +1,4 @@
-package com.chat.messages.messages.dto;
+package com.chat.websocket.dto.messages;
 
 import lombok.Data;
 

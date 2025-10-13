@@ -1,8 +1,7 @@
 package com.chat.messages.messages.controllers;
 
-import com.chat.messages.messages.dto.MsgSendRespDto;
+import com.chat.messages.messages.dto.messages.ReceiverRespDo;
 import com.chat.messages.messages.services.MessageService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +17,8 @@ public class MessageController {
     private MessageService messageService;
 
     @GetMapping("/unsent-messages/{id}")
-    public ResponseEntity<List<MsgSendRespDto>> getUnsentMessagesById(@PathVariable("id") String userId) {
-        List<MsgSendRespDto> response = messageService.getUnSentMessagesForUser(userId);
+    public ResponseEntity<List<ReceiverRespDo>> getUnsentMessagesById(@PathVariable("id") String userId) {
+        List<ReceiverRespDo> response = messageService.getUnSentMessagesForUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

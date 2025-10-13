@@ -1,9 +1,9 @@
 package com.chat.websocket.services;
 
 import com.chat.websocket.config.RabbitMqConfig;
-import com.chat.websocket.dto.MsgSendRespDto;
-import com.chat.websocket.dto.ReceiverRespDo;
-import com.chat.websocket.dto.MsgStatRespDto;
+import com.chat.websocket.dto.messages.MsgSendRespDto;
+import com.chat.websocket.dto.messages.ReceiverRespDo;
+import com.chat.websocket.dto.messages.MsgStatRespDto;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,22 +13,28 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class RabbitConsumerService {
 
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private final ChatWebSocketHandler chatWebSocketHandler;
 
     @RabbitListener(queues = RabbitMqConfig.MESSAGE_RESPONSE_QUEUE)
-    public void listenToMessageProcessResponse(MsgSendRespDto<MsgStatRespDto, ReceiverRespDo> msgSendRespDto){
-        //receiver first
-        simpMessagingTemplate.convertAndSend("/topic/"+msgSendRespDto.getReceiverId(), msgSendRespDto.getReceiver());
-        //sender at last
-        simpMessagingTemplate.convertAndSend("/topic/"+msgSendRespDto.getSenderId(), msgSendRespDto.getSender());
-    }
+    public void listenToMessageProcessResponse(MsgSendRespDto<MsgStatRespDto, ReceiverRespDo> msgSendRespDto) {
 
-    @RabbitListener(queues = RabbitMqConfig.MESSAGE_STATUS_RESPONSE_QUEUE)
-    public void listenToMsgStatResponse(MsgSendRespDto<MsgStatRespDto, MsgStatRespDto> msgSendRespDto){
-        //receiver first
-        simpMessagingTemplate.convertAndSend("/topic/"+msgSendRespDto.getReceiverId(), msgSendRespDto.getReceiver());
-        //sender at last
-        simpMessagingTemplate.convertAndSend("/topic/"+msgSendRespDto.getSenderId(), msgSendRespDto.getSender());
+        // Send to receiver
+        boolean receiverSent = chatWebSocketHandler.sendMessageToUser(
+                msgSendRespDto.getReceiverId(),
+                msgSendRespDto.getReceiver()
+        );
+        if (!receiverSent) {
+            System.out.println("⚠️ Receiver not connected: " + msgSendRespDto.getReceiverId());
+        }
+
+        // Send to sender
+        boolean senderSent = chatWebSocketHandler.sendMessageToUser(
+                msgSendRespDto.getSenderId(),
+                msgSendRespDto.getSender()
+        );
+        if (!senderSent) {
+            System.out.println("⚠️ Sender not connected: " + msgSendRespDto.getSenderId());
+        }
     }
 
 }

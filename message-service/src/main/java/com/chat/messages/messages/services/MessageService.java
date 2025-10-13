@@ -1,6 +1,8 @@
 package com.chat.messages.messages.services;
 
-import com.chat.messages.messages.dto.*;
+import com.chat.messages.messages.dto.messages.*;
+import com.chat.messages.messages.dto.status.StatusDto;
+import com.chat.messages.messages.dto.status.StatusUpdateRespDto;
 import com.chat.messages.messages.entities.MediaFile;
 import com.chat.messages.messages.entities.Message;
 import com.chat.messages.messages.entities.Recipient;
@@ -14,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,10 +28,7 @@ public class MessageService {
     private ChatService chatService;
     private MediaFileRepo mediaFileRepo;
     private RecipientRepo recipientRepo;
-    private UserService userService;
 
-    //TODO: in case of a group chat use only chat id to validate
-    // in case of a 1 to 1 use sender, receiver to validate
     public Mono<ChatResponseDto> validateChat(String senderID, String receiverID){
       return chatService.getChatDetails(senderID, receiverID);
     }
@@ -62,13 +61,17 @@ public class MessageService {
         recipient.setUserId(chatResponseDto.getReceiverId());
         recipientRepo.save(recipient);
 
-        MediaFile savedMediaFile = null;
+        List<MediaFile> savedMediaFiles = null;
+        System.out.println(messageDto.getMediaList());
 
-        if (messageDto.getMediaUrl() != null && !messageDto.getMediaUrl().isEmpty()) {
-            savedMediaFile = saveFileData(newMessage,messageDto.getMediaUrl(),messageDto.getMediaPublicId());
+        if (messageDto.getMediaList() != null && !messageDto.getMediaList().isEmpty()) {
+            savedMediaFiles = new ArrayList<>();
+            for(MediaDto mediaDto: messageDto.getMediaList()){
+                savedMediaFiles.add(saveFileData(newMessage,mediaDto.getUrl(),mediaDto.getPublicId()));
+            }
         }
 
-        return MessageDtoMapper.toMsgRespDto(newMessage,savedMediaFile, chatResponseDto);
+        return MessageDtoMapper.toMsgRespDto(newMessage,savedMediaFiles, chatResponseDto.getReceiverId());
     }
 
     private MediaFile saveFileData(Message newMsg, String mediaUri,String mediaPubId) {
@@ -79,28 +82,34 @@ public class MessageService {
         return mediaFileRepo.save(mediaFile);
     }
 
-    public List<MsgSendRespDto> getUnSentMessagesForUser(String userId) {
-        System.out.println("here");
-        // Fetch messages where the user is a recipient and status is SENT
+    public List<ReceiverRespDo> getUnSentMessagesForUser(String userId) {
         List<Message> unSentMessages = messageRepo.findAllByRecipientsUserIdAndStatus(
                 userId,
                 MessageStatus.SENT
         );
 
         for (Message msg : unSentMessages) {
-            System.out.println("id: " + msg.getId() +
-                    ", senderId: " + msg.getFromId() +
-                    ", content: " + msg.getMessage() +
-                    ", status: " + msg.getStatus());
+            log.info("id: {}, senderId: {}, content: {}, status: {}, mediaCount: {}",
+                    msg.getId(), msg.getFromId(), msg.getMessage(),
+                    msg.getStatus(), msg.getMediaFiles().size());
         }
 
-        // Map to response DTOs
         return unSentMessages.stream()
                 .map(message -> {
-                    var media = message.getMediaFiles().isEmpty() ? null : message.getMediaFiles().get(0);
-                    return MessageDtoMapper.toMsgRespDto(message, media, null);
+                    List<MediaFile> media = message.getMediaFiles().isEmpty() ? null : message.getMediaFiles();
+                    return MessageDtoMapper.toReceiverRespDo(message, media);
                 })
                 .toList();
+    }
+
+    public StatusUpdateRespDto statusUpdate(StatusDto status){
+        Message message = messageRepo.findById(status.getMessageId()).orElse(null);
+        if(message != null){
+            message.setStatus(status.getStatus());
+            messageRepo.save(message);
+        }
+
+        return new StatusUpdateRespDto(status.getUpdatedById(), message.getFromId(), status);
     }
 
 

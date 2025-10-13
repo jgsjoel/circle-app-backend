@@ -20,6 +20,12 @@ spring:
               predicates:
                 - Path=/users/**
 
+            - id: websocket-service
+              uri: lb:ws://websocket-service
+              predicates:
+                - Path=/ws/**
+
+
 eureka:
   client:
     register-with-eureka: true

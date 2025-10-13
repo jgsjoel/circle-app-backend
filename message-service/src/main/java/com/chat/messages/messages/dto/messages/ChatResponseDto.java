@@ -1,4 +1,4 @@
-package com.chat.messages.messages.dto;
+package com.chat.messages.messages.dto.messages;
 
 import lombok.Data;
 

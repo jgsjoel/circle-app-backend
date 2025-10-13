@@ -1,7 +1,12 @@
 package com.chat.messages.messages.services;
 
 import com.chat.messages.messages.config.RabbitConfig;
-import com.chat.messages.messages.dto.*;
+import com.chat.messages.messages.dto.messages.MessageDto;
+import com.chat.messages.messages.dto.messages.MsgSendRespDto;
+import com.chat.messages.messages.dto.messages.MsgStatRespDto;
+import com.chat.messages.messages.dto.messages.ReceiverRespDo;
+import com.chat.messages.messages.dto.status.StatusDto;
+import com.chat.messages.messages.dto.status.StatusUpdateRespDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -33,23 +38,23 @@ public class ConsumerService {
         }
     }
 
-//    @RabbitListener(queues = {RabbitConfig.MESSAGE_STATUS_PROCESS_QUEUE})
-//    public void consumeMsgStat(MsgStatUpdate msgStatUpdate){
-//        try {
-//            MsgSendRespDto<MsgStatRespDto, MsgStatRespDto> msgSendRespDto = messageService.updateStatus(msgStatUpdate);
-//            if (msgSendRespDto != null) {
-//                publisherService.sendToMsgStatResponse(msgSendRespDto);
-//            } else {
-//                log.warn("No status response to send for Sender: {}, Receiver: {}",
-//                        msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
-//            }
-//        } catch (IllegalArgumentException e) {
-//            log.warn("Empty Chat Response, skipping message. Sender: {}, Receiver: {}",
-//                    msgStatUpdate.getSenderId(), msgStatUpdate.getReceiverId());
-//        } catch (Exception e) {
-//            log.error("Unexpected error while processing message: {}", msgStatUpdate, e);
-//        }
-//    }
+    @RabbitListener(queues = {RabbitConfig.MESSAGE_STATUS_PROCESS_QUEUE})
+    public void consumeMsgStat(StatusDto statusDto){
+        try {
+            StatusUpdateRespDto statusUpdate = messageService.statusUpdate(statusDto);
+            if (statusUpdate != null) {
+                publisherService.sendToMsgStatResponse(statusUpdate);
+            } else {
+                log.warn("No status response to send for update by: {}, messageId: {}",
+                        statusDto.getUpdatedById(), statusDto.getMessageId());
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("Empty Chat Response, skipping message. update by: {}, message: {}",
+                    statusDto.getUpdatedById(), statusDto.getMessageId());
+        } catch (Exception e) {
+            log.error("Unexpected error while processing message: {}", statusDto, e);
+        }
+    }
 
 
 }

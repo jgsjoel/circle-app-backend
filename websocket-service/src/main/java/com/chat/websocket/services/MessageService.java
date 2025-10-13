@@ -1,7 +1,6 @@
 package com.chat.websocket.services;
 
-import com.chat.websocket.dto.LastSeenDto;
-import com.chat.websocket.dto.ReceiverRespDo;
+import com.chat.websocket.dto.messages.ReceiverRespDo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
