@@ -25,6 +25,11 @@ spring:
               predicates:
                 - Path=/ws/**
 
+            - id: message-service
+              uri: lb://message-service
+              predicates:
+                - Path=/messages/**
+
 
 eureka:
   client:

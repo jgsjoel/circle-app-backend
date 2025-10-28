@@ -12,12 +12,15 @@ import java.util.List;
 
 public class MessageDtoMapper {
 
-    public static MsgSendRespDto toMsgRespDto(Message message, List<MediaFile> mediaFiles, String receiverId) {
+    public static MsgSendRespDto toMsgRespDto(Message message, List<MediaFile> mediaFiles, String receiverId,String senderMsgId,String senderChatId) {
 
         //goes to sender
         MsgStatRespDto senderRespDto = new MsgStatRespDto();
+        senderRespDto.setMessageId(senderMsgId);
+        senderRespDto.setPubChatId(message.getChatId());
         senderRespDto.setMessageStatus(message.getStatus());
         senderRespDto.setPubMsgId(message.getId());
+        senderRespDto.setChatId(senderChatId);
 
         List<MediaDto> mediaDtoList = new ArrayList<>();;
         if (mediaFiles != null && !mediaFiles.isEmpty()){
@@ -31,7 +34,7 @@ public class MessageDtoMapper {
 
         //goes to receiver
         ReceiverRespDo receiverRespDo = new ReceiverRespDo();
-        receiverRespDo.setMessageId(message.getId());
+        receiverRespDo.setPubMessageId(message.getId());
         receiverRespDo.setMediaDtoList(mediaDtoList);
         receiverRespDo.setMessage(message.getMessage());
         receiverRespDo.setSenderId(message.getFromId());
@@ -61,7 +64,7 @@ public class MessageDtoMapper {
         }
 
         ReceiverRespDo receiverRespDo = new ReceiverRespDo();
-        receiverRespDo.setMessageId(message.getId());
+        receiverRespDo.setPubMessageId(message.getId());
         receiverRespDo.setMediaDtoList(mediaDtoList);
         receiverRespDo.setMessage(message.getMessage());
         receiverRespDo.setSenderId(message.getFromId());

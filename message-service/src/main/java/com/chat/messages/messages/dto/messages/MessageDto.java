@@ -18,6 +18,8 @@ public class MessageDto {
     @JsonProperty("message_id")
     private String messageId;
     private String message;
+    @JsonProperty("chat_id")
+    private String chatId;
     @NotBlank
     @JsonProperty("sender_id")
     private String senderId;

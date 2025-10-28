@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class ReceiverRespDo {
 
-    private String messageId;
+    private String pubMessageId;
     private String message;
     private String senderId;
     private String senderMobile;

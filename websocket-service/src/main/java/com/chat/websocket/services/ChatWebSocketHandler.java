@@ -1,10 +1,12 @@
 package com.chat.websocket.services;
 
 import com.chat.websocket.dto.LastSeenDto;
+import com.chat.websocket.dto.ResponseWrapDto;
 import com.chat.websocket.dto.messages.InComingMsgStruct;
 import com.chat.websocket.dto.messages.MessageDto;
 import com.chat.websocket.dto.messages.ReceiverRespDo;
 import com.chat.websocket.dto.status.StatusDto;
+import com.chat.websocket.enums.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -48,11 +50,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         sessions.put(userId, session);
         System.out.println("✅ Connected user: " + userId);
 
-        System.out.println("-----------getUnsentMessagesByUserId triggered------------");
-        List<ReceiverRespDo> messages = messageService.getUnsentMessagesByLastSeen(userId).block();
-        if (messages != null && !messages.isEmpty()) {
-            sendMessageToUser(userId, messages);
-        }
+//        System.out.println("-----------getUnsentMessagesByUserId triggered------------");
+//        List<ReceiverRespDo> messages = messageService.getUnsentMessagesByLastSeen(userId).block();
+//        ResponseWrapDto<List<ReceiverRespDo>> receiverRespDoResponseWrapDto = new ResponseWrapDto<>();
+//        receiverRespDoResponseWrapDto.setContent(messages);
+//        receiverRespDoResponseWrapDto.setType(MessageType.MESSAGE);
+//        if (messages != null && !messages.isEmpty()) {
+//            sendMessageToUser(userId, receiverRespDoResponseWrapDto);
+//        }
     }
 
     @Override
@@ -68,6 +73,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
             switch (incoming.getMessageType()) {
                 case "message" -> {
+                    System.out.println("here");
                     MessageDto messageDto = objectMapper.convertValue(incoming.getMessage(), MessageDto.class);
                     publisherService.sendToProcess(messageDto);
                 }
@@ -82,9 +88,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             System.err.println("❌ Failed to parse message: " + e.getMessage());
             session.sendMessage(new TextMessage("❌ Invalid message format"));
         }
-
-        // Example: echo back only to sender
-        session.sendMessage(new TextMessage("Echo: " + payload));
     }
 
     @Override
@@ -104,7 +107,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     /**
      * Send a message to a specific user by userId.
      */
-    public boolean sendMessageToUser(String userId, Object messageObj) {
+    public boolean sendMessageToUser(String userId, ResponseWrapDto messageObj) {
         WebSocketSession session = sessions.get(userId);
         if (session == null || !session.isOpen()) {
             System.out.println("⚠️ Cannot send message, user not connected: " + userId);

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-
 @Service
 public class UserService {
 

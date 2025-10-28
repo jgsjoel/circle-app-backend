@@ -25,6 +25,7 @@ public class ConsumerService {
         try {
             MsgSendRespDto<MsgStatRespDto, ReceiverRespDo> msgSendRespDto = messageService.saveMessage(messageDto);
             if (msgSendRespDto != null) {
+                System.out.println("message id"+messageDto.getMessageId());
                 publisherService.sendToMessageProcessResponse(msgSendRespDto);
             } else {
                 log.warn("No message response to send for Sender: {}, Receiver: {}",

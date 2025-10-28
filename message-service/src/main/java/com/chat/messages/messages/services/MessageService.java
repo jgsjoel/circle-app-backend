@@ -71,7 +71,7 @@ public class MessageService {
             }
         }
 
-        return MessageDtoMapper.toMsgRespDto(newMessage,savedMediaFiles, chatResponseDto.getReceiverId());
+        return MessageDtoMapper.toMsgRespDto(newMessage,savedMediaFiles, chatResponseDto.getReceiverId(),messageDto.getMessageId(),messageDto.getChatId());
     }
 
     private MediaFile saveFileData(Message newMsg, String mediaUri,String mediaPubId) {
