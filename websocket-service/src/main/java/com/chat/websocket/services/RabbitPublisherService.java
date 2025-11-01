@@ -30,5 +30,4 @@ public class RabbitPublisherService {
         rabbitTemplate.convertAndSend(RabbitMqConfig.LAST_SEEN_EXCHANGE,RabbitMqConfig.LAST_SEEN_QUEUE,lastSeenDto);
     }
 
-
 }

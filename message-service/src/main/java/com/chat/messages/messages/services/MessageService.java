@@ -109,7 +109,17 @@ public class MessageService {
             messageRepo.save(message);
         }
 
-        return new StatusUpdateRespDto(status.getUpdatedById(), message.getFromId(), status);
+        MsgStatRespDto msgStatRespDto =  new MsgStatRespDto();
+        msgStatRespDto.setPubMsgId(status.getMessageId());
+        msgStatRespDto.setMessageStatus(status.getStatus());
+        msgStatRespDto.setPubChatId(message.getChatId());
+
+        StatusUpdateRespDto statusUpdateRespDto = new StatusUpdateRespDto();
+        statusUpdateRespDto.setMsgStatRespDto(msgStatRespDto);
+        statusUpdateRespDto.setUpdatedById(status.getUpdatedById());
+        statusUpdateRespDto.setOrigSenderId(message.getFromId());
+
+        return statusUpdateRespDto;
     }
 
 
