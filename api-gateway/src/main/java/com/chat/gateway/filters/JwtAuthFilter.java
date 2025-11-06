@@ -25,7 +25,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String upgradeHeader = exchange.getRequest().getHeaders().getFirst("Upgrade");
 
         // Skip for auth/public routes
-        if (path.startsWith("/auth") || path.startsWith("/public")) {
+        if (path.startsWith("/auth") || path.startsWith("/public") || path.startsWith("/fcm")) {
+            System.out.println("Skipping JWT auth for path: " + path);
             return chain.filter(exchange);
         }
 

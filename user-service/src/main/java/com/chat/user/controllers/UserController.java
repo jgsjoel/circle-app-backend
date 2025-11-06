@@ -140,6 +140,21 @@ public class UserController {
         return new ResponseEntity<LastSeenDto>(userService.getLastSeenByUserId(id),HttpStatus.OK);
     }
 
+    @PostMapping("/refresh-contact-images")
+    public ResponseEntity<Map<String, Object>> refreshContactImages(@RequestBody Map<String, List<String>> request) {
+        List<String> publicIds = request.get("public_ids");
+
+        if (publicIds == null || publicIds.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "No public_ids provided"));
+        }
+
+        List<Map<String, String>> contacts = userService.getContactImagesByPublicIds(publicIds);
+
+        return ResponseEntity.ok(Map.of("contacts", contacts));
+    }
+
+
+
 
 }
 

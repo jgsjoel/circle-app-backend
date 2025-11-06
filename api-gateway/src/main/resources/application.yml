@@ -30,6 +30,12 @@ spring:
               predicates:
                 - Path=/messages/**
 
+            - id: fcm-service
+              uri: lb://fcm-service
+              predicates:
+                - Path=/fcm/**
+
+
 
 eureka:
   client:

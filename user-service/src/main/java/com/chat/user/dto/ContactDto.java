@@ -10,5 +10,6 @@ public class ContactDto {
     private String name;
     @JsonProperty("public_id")
     private String publicId;
+    private String imageUrl;
 
 }

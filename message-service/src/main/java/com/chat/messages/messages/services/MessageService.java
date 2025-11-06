@@ -1,5 +1,6 @@
 package com.chat.messages.messages.services;
 
+import com.chat.messages.messages.dto.ResponseWrapDto;
 import com.chat.messages.messages.dto.messages.*;
 import com.chat.messages.messages.dto.status.StatusDto;
 import com.chat.messages.messages.dto.status.StatusUpdateRespDto;
@@ -7,6 +8,7 @@ import com.chat.messages.messages.entities.MediaFile;
 import com.chat.messages.messages.entities.Message;
 import com.chat.messages.messages.entities.Recipient;
 import com.chat.messages.messages.enums.MessageStatus;
+import com.chat.messages.messages.enums.MessageType;
 import com.chat.messages.messages.mapper.MessageDtoMapper;
 import com.chat.messages.messages.repository.MediaFileRepo;
 import com.chat.messages.messages.repository.MessageRepo;
@@ -16,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,4 +127,28 @@ public class MessageService {
     }
 
 
+    public ResponseWrapDto<ReceiverRespDo> getUndeliveredMessagesForUser(String userId, Instant since) {
+
+        // convert Instant to LocalDateTime using UTC (adjust to ZoneId.systemDefault() if you prefer server local time)
+        LocalDateTime sinceLdt = LocalDateTime.ofInstant(since, java.time.ZoneOffset.UTC);
+
+        List<Message> undeliveredMessages = messageRepo.findAllByRecipientsUserIdAndStatusAndSentAtAfter(
+                userId,
+                MessageStatus.SENT,
+                sinceLdt
+        );
+
+        List<ReceiverRespDo> undeliveredMessageList = undeliveredMessages.stream()
+                .map(message -> {
+                    List<MediaFile> media = message.getMediaFiles().isEmpty() ? null : message.getMediaFiles();
+                    return MessageDtoMapper.toReceiverRespDo(message, media);
+                })
+                .toList();
+
+        ResponseWrapDto<ReceiverRespDo> receiverRespDoResponseWrapDto = new ResponseWrapDto<>();
+        receiverRespDoResponseWrapDto.setContent(undeliveredMessageList);
+        receiverRespDoResponseWrapDto.setType(MessageType.MESSAGE);
+
+        return receiverRespDoResponseWrapDto;
+    }
 }

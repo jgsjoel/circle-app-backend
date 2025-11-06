@@ -1,13 +1,16 @@
 package com.chat.messages.messages.controllers;
 
+import com.chat.messages.messages.dto.ResponseWrapDto;
 import com.chat.messages.messages.dto.messages.ReceiverRespDo;
 import com.chat.messages.messages.services.CloudinaryService;
 import com.chat.messages.messages.services.MessageService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -25,19 +28,6 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-
-//    @PostMapping("/signed-url/{chatId}")
-//    public ResponseEntity<Map<String, Object>> uploadMedia(
-//            @RequestHeader("X-User-Id") String userId,
-//            @PathVariable("chatId") String chatId,
-//            @RequestBody Map<String, Object> body
-//    ) {
-//        // you can read the files list from body if needed:
-//        System.out.println(body.get("files"));
-//
-//        return ResponseEntity.ok(cloudinaryService.getUploadSignature(userId, chatId));
-//    }
-
     @PostMapping("/signed-url/{chatId}")
     public ResponseEntity<?> uploadMedia(
             @RequestHeader("X-User-Id") String userId,
@@ -53,6 +43,18 @@ public class MessageController {
         List<Map<String, String>> signatures = cloudinaryService.getUploadSignatures(userId, chatId, files);
 
         return ResponseEntity.ok(Map.of("urls", signatures));
+    }
+
+    @GetMapping("/undelivered")
+    public ResponseEntity<ResponseWrapDto<ReceiverRespDo>> getUndeliveredMessages(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestParam("since") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant since
+    ) {
+        System.out.println(since);
+        System.out.println(userId);
+        ResponseWrapDto<ReceiverRespDo> undeliveredMessages = messageService.getUndeliveredMessagesForUser(userId, since);
+        System.out.println(undeliveredMessages);
+        return ResponseEntity.ok(undeliveredMessages);
     }
 
 

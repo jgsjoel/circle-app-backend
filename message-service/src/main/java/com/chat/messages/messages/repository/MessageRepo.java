@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,5 +19,11 @@ public interface MessageRepo extends JpaRepository<Message,String> {
             MessageStatus status
     );
 
+
+    List<Message> findAllByRecipientsUserIdAndStatusAndSentAtAfter(
+            String userId,
+            MessageStatus status,
+            LocalDateTime since
+    );
 
 }

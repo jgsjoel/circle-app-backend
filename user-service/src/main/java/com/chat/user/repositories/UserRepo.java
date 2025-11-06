@@ -18,4 +18,8 @@ public interface UserRepo extends JpaRepository<User,String> {
 
     List<User> findByMobileIn(List<String> mobiles);
 
+    List<User> findByIdIn(List<String> publicIds);
+
+
+
 }
