@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
-	"os/signal"
-	"syscall"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,63 +13,140 @@ import (
 	"github.com/hudl/fargo"
 )
 
-const (
-	SERVICE_NAME = "fcm-service"
-	SERVICE_PORT = 8080
-	EUREKA_URL   = "http://localhost:8761/eureka"
-)
+type FCMRequest struct {
+	Token string                 `json:"token"`
+	Title string                 `json:"title"`
+	Body  string                 `json:"body"`
+	Data  map[string]interface{} `json:"data,omitempty"`
+	Topic string                 `json:"topic,omitempty"`
+}
 
-// getLocalIP tries to find the local, non-loopback IP
-func getLocalIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		log.Printf("Could not get local IP, defaulting to localhost: %v", err)
-		return "localhost"
-	}
-
-	for _, addr := range addrs {
-		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
-			return ipNet.IP.String()
-		}
-	}
-	return "localhost"
+type FCMResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Error   string `json:"error,omitempty"`
 }
 
 func main() {
-	ip := getLocalIP()
+	// Get configuration from environment variables
+	port := getEnv("SERVER_PORT", "8087")
+	serviceName := "fcm-service"
+	eurekaURL := getEnv("EUREKA_DEFAULT_ZONE", "http://localhost:8761/eureka")
 
+	// Get local IP address
+	localIP := getLocalIP()
+
+	// Create Fiber app
 	app := fiber.New(fiber.Config{
-		AppName: SERVICE_NAME,
+		AppName: "FCM Service v1.0",
 	})
 
-	app.Use(logger.New())
+	// Middleware
 	app.Use(cors.New())
+	app.Use(logger.New())
 
+	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"status":    "UP",
-			"service":   SERVICE_NAME,
-			"timestamp": time.Now().Unix(),
-			"ip":        ip,
+			"status":  "UP",
+			"service": serviceName,
+			"time":    time.Now(),
 		})
 	})
 
-	app.Get("/fcm", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "FCM Service is running",
-			"ip":      ip,
+	// FCM endpoints
+	app.Post("/fcm/send", sendNotification)
+	app.Post("/fcm/send-to-topic", sendTopicNotification)
+	app.Get("/fcm/status", getStatus)
+
+	// Register with Eureka
+	go registerWithEureka(serviceName, localIP, port, eurekaURL)
+
+	// Start server
+	log.Printf("Starting %s on %s:%s", serviceName, localIP, port)
+	log.Fatal(app.Listen(":" + port))
+}
+
+func sendNotification(c *fiber.Ctx) error {
+	var req FCMRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(FCMResponse{
+			Success: false,
+			Error:   "Invalid request body",
 		})
+	}
+
+	// Validate required fields
+	if req.Token == "" || req.Title == "" || req.Body == "" {
+		return c.Status(400).JSON(FCMResponse{
+			Success: false,
+			Error:   "Token, title, and body are required",
+		})
+	}
+
+	// TODO: Implement actual FCM sending logic here
+	log.Printf("Sending notification to token: %s, title: %s, body: %s", req.Token, req.Title, req.Body)
+
+	return c.JSON(FCMResponse{
+		Success: true,
+		Message: "Notification sent successfully",
 	})
+}
 
-	eurekaConnection := fargo.NewConn(EUREKA_URL)
+func sendTopicNotification(c *fiber.Ctx) error {
+	var req FCMRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(FCMResponse{
+			Success: false,
+			Error:   "Invalid request body",
+		})
+	}
 
+	// Validate required fields
+	if req.Topic == "" || req.Title == "" || req.Body == "" {
+		return c.Status(400).JSON(FCMResponse{
+			Success: false,
+			Error:   "Topic, title, and body are required",
+		})
+	}
+
+	// TODO: Implement actual FCM topic sending logic here
+	log.Printf("Sending notification to topic: %s, title: %s, body: %s", req.Topic, req.Title, req.Body)
+
+	return c.JSON(FCMResponse{
+		Success: true,
+		Message: "Topic notification sent successfully",
+	})
+}
+
+func getStatus(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"service": "fcm-service",
+		"status":  "running",
+		"version": "1.0.0",
+		"time":    time.Now(),
+	})
+}
+
+func registerWithEureka(serviceName, ip, port, eurekaURL string) {
+	// Parse port to int
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		log.Printf("Invalid port: %s", port)
+		return
+	}
+
+	// Create Eureka connection
+	conn := fargo.NewConn(eurekaURL)
+
+	// Create application instance
 	instance := &fargo.Instance{
 		HostName:         ip,
+		Port:             portInt,
+		App:              serviceName,
 		IPAddr:           ip,
-		App:              SERVICE_NAME,
-		Port:             SERVICE_PORT,
-		VipAddress:       SERVICE_NAME,
-		SecureVipAddress: SERVICE_NAME,
+		VipAddress:       serviceName,
+		SecureVipAddress: serviceName,
 		Status:           fargo.UP,
 		DataCenterInfo: fargo.DataCenterInfo{
 			Class: "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
@@ -81,37 +156,49 @@ func main() {
 			RenewalIntervalInSecs: 30,
 			DurationInSecs:        90,
 		},
+		Metadata: fargo.InstanceMetadata{},
 	}
 
-	go func() {
-		log.Printf("Registering %s with Eureka at %s (IP: %s)", SERVICE_NAME, EUREKA_URL, ip)
-		err := eurekaConnection.RegisterInstance(instance)
+	// Register the service
+	log.Printf("Registering %s with Eureka at %s", serviceName, eurekaURL)
+	err = conn.RegisterInstance(instance)
+	if err != nil {
+		log.Printf("Failed to register with Eureka: %v", err)
+		return
+	}
+
+	log.Printf("Successfully registered %s with Eureka", serviceName)
+
+	// Send heartbeats
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		err := conn.HeartBeatInstance(instance)
 		if err != nil {
-			log.Printf("Failed to register with Eureka: %v", err)
+			log.Printf("Failed to send heartbeat: %v", err)
 		} else {
-			log.Printf("Successfully registered with Eureka")
+			log.Printf("Heartbeat sent for %s", serviceName)
 		}
+	}
+}
 
-		ticker := time.NewTicker(30 * time.Second)
-		defer ticker.Stop()
+func getLocalIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Printf("Error getting local IP: %v", err)
+		return "localhost"
+	}
+	defer conn.Close()
 
-		for range ticker.C {
-			if err := eurekaConnection.HeartBeatInstance(instance); err != nil {
-				log.Printf("Failed to send heartbeat: %v", err)
-			}
-		}
-	}()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String()
+}
 
-	// graceful shutdown
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		log.Println("Shutting down gracefully...")
-		eurekaConnection.DeregisterInstance(instance)
-		app.Shutdown()
-	}()
-
-	log.Printf("Starting %s on %s:%d", SERVICE_NAME, ip, SERVICE_PORT)
-	log.Fatal(app.Listen(fmt.Sprintf(":%d", SERVICE_PORT)))
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
