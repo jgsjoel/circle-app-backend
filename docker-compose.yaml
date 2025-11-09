@@ -5,11 +5,12 @@ networks:
 services:
 
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:management
     environment:
       - 'RABBITMQ_DEFAULT_PASS=secret'
       - 'RABBITMQ_DEFAULT_USER=myuser'
-      -  'RABBITMQ_PLUGINS_ENABLE=rabbitmq_stomp,rabbitmq_web_stomp'
+      - 'RABBITMQ_PLUGINS_ENABLE=rabbitmq_stomp,rabbitmq_web_stomp'
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -17,8 +18,15 @@ services:
       - '15674:15674'
     command: >
       sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: # <<< THIS MAKES SURE IT JOINS THE NETWORK
+      - app-network
 
-#### databases ####
+  #### databases ####
 
 #  user_service_db:
 #    image: postgres:15-alpine
