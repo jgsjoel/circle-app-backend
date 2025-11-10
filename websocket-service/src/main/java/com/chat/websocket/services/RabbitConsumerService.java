@@ -32,7 +32,7 @@ public class RabbitConsumerService {
         if (!receiverSent) {
             undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getReceiverId(),msgSendRespDto.getReceiver().getPubMessageId(),MessageType.MESSAGE);
             //***************** Trigger FCM notification ****************//
-            rabbitPublisherService.sendToFcm();
+            rabbitPublisherService.sendToFcm(receiverRespDoResponseWrapDto);
             System.out.println("⚠️ Receiver not connected: " + msgSendRespDto.getReceiverId());
         }
 
@@ -43,7 +43,7 @@ public class RabbitConsumerService {
         boolean senderSent = chatWebSocketHandler.sendMessageToUser(msgSendRespDto.getSenderId(),msgStatRespDtoResponseWrapDto);
         if (!senderSent) {
             undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getSenderId(),msgSendRespDto.getSender().getPubMsgId(),MessageType.STATUS_UPDATE);
-            rabbitPublisherService.sendToFcm();
+            rabbitPublisherService.sendToFcm(msgStatRespDtoResponseWrapDto);
             System.out.println("⚠️ Sender not connected: " + msgSendRespDto.getSenderId());
         }
     }
@@ -64,6 +64,7 @@ public class RabbitConsumerService {
                 statusUpdate.getMsgStatRespDto().getMessageId(),
                 MessageType.STATUS_UPDATE
             );
+            rabbitPublisherService.sendToFcm(originResponseWrap);
             System.out.println("⚠️ User not connected for status update: " + statusUpdate.getOrigSenderId());
         }
 
@@ -78,6 +79,7 @@ public class RabbitConsumerService {
                     statusUpdate.getMsgStatRespDto().getMessageId(),
                     MessageType.STATUS_UPDATE
             );
+            rabbitPublisherService.sendToFcm(updatedByResponseWrap);
             System.out.println("⚠️ User not connected for status update: " + statusUpdate.getUpdatedById());
         }
     }

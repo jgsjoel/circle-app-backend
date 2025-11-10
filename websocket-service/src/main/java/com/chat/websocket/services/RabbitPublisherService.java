@@ -30,8 +30,8 @@ public class RabbitPublisherService {
         rabbitTemplate.convertAndSend(RabbitMqConfig.LAST_SEEN_EXCHANGE,RabbitMqConfig.LAST_SEEN_QUEUE,lastSeenDto);
     }
 
-    public void sendToFcm(){
-        rabbitTemplate.convertAndSend(RabbitMqConfig.FCM_MESSAGE_EXCHANGE,RabbitMqConfig.FCM_MESSAGE_PROCESS_QUEUE,lastSeenDto);
+    public void sendToFcm(Object payload){
+        rabbitTemplate.convertAndSend(RabbitMqConfig.FCM_MESSAGE_EXCHANGE,RabbitMqConfig.FCM_MESSAGE_PROCESS_QUEUE,payload);
     }
 
 
