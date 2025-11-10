@@ -215,6 +215,20 @@ services:
     env_file:
       - .env
 
+  fcm-service:
+    image: joelgallan/fcm-service:latest
+    container_name: fcm-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+    ports:
+      - "8089:8089"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
 volumes:
   redis-data:
 #  pg-data:

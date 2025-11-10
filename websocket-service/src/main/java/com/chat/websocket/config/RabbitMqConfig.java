@@ -16,6 +16,8 @@ import org.springframework.amqp.core.Queue;
 public class RabbitMqConfig {
 
     public static final String MESSAGE_EXCHANGE = "message.exchange";
+    public static final String FCM_MESSAGE_EXCHANGE = "fcm.message.exchange";
+    public final static String FCM_MESSAGE_PROCESS_QUEUE = "fcm.process";
 
     public final static String MESSAGE_PROCESS_QUEUE = "message.process"; //published by this web socket service
 
@@ -36,6 +38,12 @@ public class RabbitMqConfig {
     @Bean
     public DirectExchange messageExchange() {
         return new DirectExchange(MESSAGE_EXCHANGE, true, false);
+        // durable = true, autoDelete = false
+    }
+
+    @Bean
+    public DirectExchange fcmExchange() {
+        return new DirectExchange(FCM_MESSAGE_EXCHANGE, true, false);
         // durable = true, autoDelete = false
     }
 

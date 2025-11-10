@@ -19,6 +19,7 @@ public class RabbitConsumerService {
 
     private final ChatWebSocketHandler chatWebSocketHandler;
     UndeliveredMessageService undeliveredMessageService;
+    RabbitPublisherService rabbitPublisherService;
 
     @RabbitListener(queues = RabbitMqConfig.MESSAGE_RESPONSE_QUEUE)
     public void listenToMessageProcessResponse(MsgSendRespDto<MsgStatRespDto, ReceiverRespDo> msgSendRespDto) {
@@ -30,6 +31,8 @@ public class RabbitConsumerService {
         boolean receiverSent = chatWebSocketHandler.sendMessageToUser(msgSendRespDto.getReceiverId(),receiverRespDoResponseWrapDto);
         if (!receiverSent) {
             undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getReceiverId(),msgSendRespDto.getReceiver().getPubMessageId(),MessageType.MESSAGE);
+            //***************** Trigger FCM notification ****************//
+            rabbitPublisherService.sendToFcm();
             System.out.println("⚠️ Receiver not connected: " + msgSendRespDto.getReceiverId());
         }
 
@@ -40,6 +43,7 @@ public class RabbitConsumerService {
         boolean senderSent = chatWebSocketHandler.sendMessageToUser(msgSendRespDto.getSenderId(),msgStatRespDtoResponseWrapDto);
         if (!senderSent) {
             undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getSenderId(),msgSendRespDto.getSender().getPubMsgId(),MessageType.STATUS_UPDATE);
+            rabbitPublisherService.sendToFcm();
             System.out.println("⚠️ Sender not connected: " + msgSendRespDto.getSenderId());
         }
     }
