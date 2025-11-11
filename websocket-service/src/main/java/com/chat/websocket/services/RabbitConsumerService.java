@@ -1,6 +1,7 @@
 package com.chat.websocket.services;
 
 import com.chat.websocket.config.RabbitMqConfig;
+import com.chat.websocket.dto.FcmMessageDto;
 import com.chat.websocket.dto.ResponseWrapDto;
 import com.chat.websocket.dto.messages.MsgSendRespDto;
 import com.chat.websocket.dto.messages.ReceiverRespDo;
@@ -28,11 +29,26 @@ public class RabbitConsumerService {
         ResponseWrapDto<ReceiverRespDo> receiverRespDoResponseWrapDto = new ResponseWrapDto<>();
         receiverRespDoResponseWrapDto.setContent(msgSendRespDto.getReceiver());
         receiverRespDoResponseWrapDto.setType(MessageType.MESSAGE);
-        boolean receiverSent = chatWebSocketHandler.sendMessageToUser(msgSendRespDto.getReceiverId(),receiverRespDoResponseWrapDto);
+
+        boolean receiverSent = chatWebSocketHandler.sendMessageToUser(
+                msgSendRespDto.getReceiverId(),
+                receiverRespDoResponseWrapDto
+        );
+
         if (!receiverSent) {
-            undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getReceiverId(),msgSendRespDto.getReceiver().getPubMessageId(),MessageType.MESSAGE);
-            //***************** Trigger FCM notification ****************//
-            rabbitPublisherService.sendToFcm(receiverRespDoResponseWrapDto);
+            undeliveredMessageService.addUndeliveredMessage(
+                    msgSendRespDto.getReceiverId(),
+                    msgSendRespDto.getReceiver().getPubMessageId(),
+                    MessageType.MESSAGE
+            );
+
+            // Trigger FCM notification for receiver
+            rabbitPublisherService.sendToFcm(
+                    new FcmMessageDto<>(
+                            msgSendRespDto.getReceiverId(),
+                            receiverRespDoResponseWrapDto
+                    )
+            );
             System.out.println("⚠️ Receiver not connected: " + msgSendRespDto.getReceiverId());
         }
 
@@ -40,38 +56,71 @@ public class RabbitConsumerService {
         ResponseWrapDto<MsgStatRespDto> msgStatRespDtoResponseWrapDto = new ResponseWrapDto<>();
         msgStatRespDtoResponseWrapDto.setContent(msgSendRespDto.getSender());
         msgStatRespDtoResponseWrapDto.setType(MessageType.STATUS_UPDATE);
-        boolean senderSent = chatWebSocketHandler.sendMessageToUser(msgSendRespDto.getSenderId(),msgStatRespDtoResponseWrapDto);
+
+        boolean senderSent = chatWebSocketHandler.sendMessageToUser(
+                msgSendRespDto.getSenderId(),
+                msgStatRespDtoResponseWrapDto
+        );
+
         if (!senderSent) {
-            undeliveredMessageService.addUndeliveredMessage(msgSendRespDto.getSenderId(),msgSendRespDto.getSender().getPubMsgId(),MessageType.STATUS_UPDATE);
-            rabbitPublisherService.sendToFcm(msgStatRespDtoResponseWrapDto);
+            undeliveredMessageService.addUndeliveredMessage(
+                    msgSendRespDto.getSenderId(),
+                    msgSendRespDto.getSender().getPubMsgId(),
+                    MessageType.STATUS_UPDATE
+            );
+
+            // Trigger FCM notification for sender
+            rabbitPublisherService.sendToFcm(
+                    new FcmMessageDto<>(
+                            msgSendRespDto.getSenderId(),
+                            msgStatRespDtoResponseWrapDto
+                    )
+            );
             System.out.println("⚠️ Sender not connected: " + msgSendRespDto.getSenderId());
         }
     }
 
+
     @RabbitListener(queues = RabbitMqConfig.MESSAGE_STATUS_RESPONSE_QUEUE)
     public void listenToStatusUpdate(StatusUpdateRespDto statusUpdate) {
 
-        System.out.println("listenToStatusUpdate: "+statusUpdate.toString());
+        System.out.println("listenToStatusUpdate: " + statusUpdate);
 
+        // Notify original sender
         ResponseWrapDto<MsgStatRespDto> originResponseWrap = new ResponseWrapDto<>();
         originResponseWrap.setContent(statusUpdate.getMsgStatRespDto());
         originResponseWrap.setType(MessageType.STATUS_UPDATE);
-        boolean originSent = chatWebSocketHandler.sendMessageToUser(statusUpdate.getOrigSenderId(), originResponseWrap);
+
+        boolean originSent = chatWebSocketHandler.sendMessageToUser(
+                statusUpdate.getOrigSenderId(),
+                originResponseWrap
+        );
 
         if (!originSent) {
             undeliveredMessageService.addUndeliveredMessage(
-                statusUpdate.getOrigSenderId(),
-                statusUpdate.getMsgStatRespDto().getMessageId(),
-                MessageType.STATUS_UPDATE
+                    statusUpdate.getOrigSenderId(),
+                    statusUpdate.getMsgStatRespDto().getMessageId(),
+                    MessageType.STATUS_UPDATE
             );
-            rabbitPublisherService.sendToFcm(originResponseWrap);
+
+            rabbitPublisherService.sendToFcm(
+                    new FcmMessageDto<>(
+                            statusUpdate.getOrigSenderId(),
+                            originResponseWrap
+                    )
+            );
             System.out.println("⚠️ User not connected for status update: " + statusUpdate.getOrigSenderId());
         }
 
+        // Notify user who updated the message
         ResponseWrapDto<MsgStatRespDto> updatedByResponseWrap = new ResponseWrapDto<>();
         updatedByResponseWrap.setContent(statusUpdate.getMsgStatRespDto());
         updatedByResponseWrap.setType(MessageType.STATUS_UPDATE);
-        boolean updaterSent = chatWebSocketHandler.sendMessageToUser(statusUpdate.getUpdatedById(), updatedByResponseWrap);
+
+        boolean updaterSent = chatWebSocketHandler.sendMessageToUser(
+                statusUpdate.getUpdatedById(),
+                updatedByResponseWrap
+        );
 
         if (!updaterSent) {
             undeliveredMessageService.addUndeliveredMessage(
@@ -79,9 +128,16 @@ public class RabbitConsumerService {
                     statusUpdate.getMsgStatRespDto().getMessageId(),
                     MessageType.STATUS_UPDATE
             );
-            rabbitPublisherService.sendToFcm(updatedByResponseWrap);
+
+            rabbitPublisherService.sendToFcm(
+                    new FcmMessageDto<>(
+                            statusUpdate.getUpdatedById(),
+                            updatedByResponseWrap
+                    )
+            );
             System.out.println("⚠️ User not connected for status update: " + statusUpdate.getUpdatedById());
         }
     }
+
 
 }

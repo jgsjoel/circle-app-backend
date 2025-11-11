@@ -1,6 +1,7 @@
 package com.chat.websocket.services;
 
 import com.chat.websocket.config.RabbitMqConfig;
+import com.chat.websocket.dto.FcmMessageDto;
 import com.chat.websocket.dto.LastSeenDto;
 import com.chat.websocket.dto.messages.MessageDto;
 import com.chat.websocket.dto.status.StatusDto;
@@ -30,8 +31,8 @@ public class RabbitPublisherService {
         rabbitTemplate.convertAndSend(RabbitMqConfig.LAST_SEEN_EXCHANGE,RabbitMqConfig.LAST_SEEN_QUEUE,lastSeenDto);
     }
 
-    public void sendToFcm(Object payload){
-        rabbitTemplate.convertAndSend(RabbitMqConfig.FCM_MESSAGE_EXCHANGE,RabbitMqConfig.FCM_MESSAGE_PROCESS_QUEUE,payload);
+    public void sendToFcm(FcmMessageDto message){
+        rabbitTemplate.convertAndSend(RabbitMqConfig.FCM_MESSAGE_EXCHANGE,RabbitMqConfig.FCM_MESSAGE_PROCESS_QUEUE,message);
     }
 
 

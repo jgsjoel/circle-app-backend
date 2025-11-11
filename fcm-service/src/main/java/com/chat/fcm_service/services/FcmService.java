@@ -13,12 +13,25 @@ public class FcmService {
 
     private FcmRepo fcmRepo;
 
-    public void SaveToken(String userId, String token) {
-        FcmToken fcmToken = new FcmToken();
-        fcmToken.setUserId(userId);
-        fcmToken.setToken(token);
-        fcmRepo.save(fcmToken);
-        log.info("Saved FCM token for userId: {}", userId);
+    public void saveToken(String userId, String token) {
+        if(userHasToken(userId,token)){
+            log.info("FCM token for userId {} is already up to date.", userId);
+        } else {
+            log.info("Saving FCM token for userId {}: {}", userId, token);
+            FcmToken existingToken = fcmRepo.findByUserId(userId);
+            if (existingToken != null) {
+                existingToken.setToken(token);
+                fcmRepo.save(existingToken);
+                log.info("Updated existing FCM token for userId {}", userId);
+            } else {
+                FcmToken newFcmToken = new FcmToken();
+                newFcmToken.setUserId(userId);
+                newFcmToken.setToken(token);
+                fcmRepo.save(newFcmToken);
+                log.info("Saved new FCM token for userId {}", userId);
+            }
+
+        }
     }
 
     public String getTokenByUserId(String userId) {
@@ -28,6 +41,11 @@ public class FcmService {
             return fcmToken.getToken();
         }
         return null;
+    }
+
+    public boolean userHasToken(String userId,String token) {
+        log.info("Checking if userId {} has an FCM token", userId);
+        return fcmRepo.existsByUserIdAndToken(userId,token);
     }
 
 }

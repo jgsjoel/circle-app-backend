@@ -25,7 +25,7 @@ public class FCMController {
             @RequestBody TokenDto tokenDto
             ) {
         log.info("Received FCM token for userId {}: {}", userId, tokenDto.getFcmToken());
-        fcmService.SaveToken(userId, tokenDto.getFcmToken());
+        fcmService.saveToken(userId, tokenDto.getFcmToken());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

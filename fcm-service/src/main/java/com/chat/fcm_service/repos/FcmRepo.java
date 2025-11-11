@@ -9,4 +9,6 @@ public interface FcmRepo extends JpaRepository<FcmToken, Long> {
 
     FcmToken findByUserId(String userId);
 
+    boolean existsByUserIdAndToken(String userId,String token);
+
 }
