@@ -6,25 +6,30 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Configuration
 public class FirebaseConfig {
 
-    private static final String SERVICE_ACCOUNT_PATH = "./serviceAccountKey.json";
+    @Value("${FIREBASE_SERVICE_ACCOUNT_JSON}")
+    private String serviceAccountJson;
 
     @Bean
     public FirebaseApp firebaseApp() {
         if (FirebaseApp.getApps().isEmpty()) {
-            try (FileInputStream serviceAccount = new FileInputStream(SERVICE_ACCOUNT_PATH)) {
-                FirebaseOptions options = new FirebaseOptions.Builder()
+            try (ByteArrayInputStream serviceAccount =
+                         new ByteArrayInputStream(serviceAccountJson.getBytes())) {
+
+                FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                         .build();
+
                 return FirebaseApp.initializeApp(options);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to initialize Firebase from " + SERVICE_ACCOUNT_PATH, e);
+                throw new IllegalStateException("Failed to initialize Firebase from environment variable", e);
             }
         }
         return FirebaseApp.getInstance();
@@ -34,6 +39,4 @@ public class FirebaseConfig {
     public FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {
         return FirebaseMessaging.getInstance(firebaseApp);
     }
-
-
 }
