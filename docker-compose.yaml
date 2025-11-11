@@ -107,127 +107,127 @@ services:
     volumes:
       - redis-data:/data
 
-#  service-registry:
-#    image: joelgallan/service-registry:latest
-#    container_name: service-registry
-#    restart: always
-#    ports:
-#      - "8761:8761"
-#    networks:
-#      - app-network
-#    healthcheck:
-#      test: [ "CMD-SHELL", "curl -f http://localhost:8761/ || exit 1" ]
-#      interval: 5s
-#      timeout: 3s
-#      retries: 5
-#
-#  auth-service:
-#    image: joelgallan/auth-service:latest
-#    container_name: auth-service
-#    restart: always
-#    ports:
-#      - "8083:8083"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#      service-registry:
-#        condition: service_healthy
-#
-#  api-gateway:
-#    image: joelgallan/api-gateway:latest
-#    container_name: api-gateway
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#    ports:
-#      - "8001:8001"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#
-#
-#  user-service:
-#    image: joelgallan/user-service:latest
-#    container_name: user-service
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#      rabbitmq:
-#        condition: service_healthy
-#
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#
-#  websocket-service:
-#    image: joelgallan/websocket-service:latest
-#    container_name: websocket-service
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#      rabbitmq:
-#        condition: service_healthy
-#    ports:
-#      - "8082:8082"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#
-#  message-service:
-#    image: joelgallan/message-service:latest
-#    container_name: message-service
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#      rabbitmq:
-#        condition: service_healthy
-#    ports:
-#      - "8085:8085"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#
-#  chat-service:
-#    image: joelgallan/chat-service:latest
-#    container_name: chat-service
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#    ports:
-#      - "8084:8084"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
-#
-#  fcm-service:
-#    image: joelgallan/fcm-service:latest
-#    container_name: fcm-service
-#    restart: always
-#    depends_on:
-#      redis-service:
-#        condition: service_healthy
-#    ports:
-#      - "8089:8089"
-#    networks:
-#      - app-network
-#    env_file:
-#      - .env
+  service-registry:
+    image: joelgallan/service-registry:latest
+    container_name: service-registry
+    restart: always
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8761/ || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  auth-service:
+    image: joelgallan/auth-service:latest
+    container_name: auth-service
+    restart: always
+    ports:
+      - "8083:8083"
+    networks:
+      - app-network
+    env_file:
+      - .env
+    depends_on:
+      redis-service:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+
+  api-gateway:
+    image: joelgallan/api-gateway:latest
+    container_name: api-gateway
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+
+  user-service:
+    image: joelgallan/user-service:latest
+    container_name: user-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  websocket-service:
+    image: joelgallan/websocket-service:latest
+    container_name: websocket-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  message-service:
+    image: joelgallan/message-service:latest
+    container_name: message-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8085:8085"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  chat-service:
+    image: joelgallan/chat-service:latest
+    container_name: chat-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  fcm-service:
+    image: joelgallan/fcm-service:latest
+    container_name: fcm-service
+    restart: always
+    depends_on:
+      redis-service:
+        condition: service_healthy
+    ports:
+      - "8089:8089"
+    networks:
+      - app-network
+    env_file:
+      - .env
 
 volumes:
   redis-data:
