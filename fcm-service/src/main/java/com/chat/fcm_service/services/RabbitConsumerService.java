@@ -40,10 +40,17 @@ public class RabbitConsumerService {
         }
 
         // Step 3: Send the payload as a data message (raw JSON)
+//
+
         Message firebaseMsg = Message.builder()
                 .setToken(fcmToken)
-                .putData("payload", payloadJson)  // 🔹 sends the full payload as data
+                .setNotification(Notification.builder()
+                        .setTitle("Hello")
+                        .setBody("You have a new message!")
+                        .build())
+                .putData("payload", payloadJson) // optional extra data
                 .build();
+
 
         String response = firebaseMessaging.send(firebaseMsg);
         System.out.println("✅ FCM sent: " + response);
