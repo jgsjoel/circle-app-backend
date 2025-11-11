@@ -21,9 +21,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String path = exchange.getRequest().getPath().toString();
+        String path = exchange.getRequest().getPath().value();
         String upgradeHeader = exchange.getRequest().getHeaders().getFirst("Upgrade");
 
+        System.out.println();
         // Skip for auth/public routes
         if (path.startsWith("/auth")) {
             System.out.println("Skipping JWT auth for path: " + path);
