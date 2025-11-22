@@ -1,38 +1,28 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-	mqttclient "server/mqtt-client"
-	rabbitmq "server/rabbit-mq"
+	"server/mqtt-client"
+	"server/rabbit-mq"
 )
 
-type MessagePayload struct {
-	ID      string `json:"id"`
-	Content string `json:"content"`
-}
-
 func main() {
-
-	ch,  rps:= rabbitmq.SetupRabbitMq()
+	// Setup RabbitMQ
+	ch, rps := rabbitmq.SetupRabbitMq()
 	defer ch.Close()
 
+	// Setup MQTT client
 	client := mqttclient.NewMQTTClient()
 	defer client.Disconnect(250)
 
-    //setup rabbit consumers
-    rabbitmq.SetupConsumerService(ch, client)
+	// Setup RabbitMQ consumers
+	rabbitmq.SetupConsumerService(ch, client)
 
-    //setup mqtt listeners
+	// Setup MQTT message listeners
 	mqttclient.SetupMessageListeners(client, rps)
-	mqttclient.SetupEventListeners()
 
-	fmt.Println("Webhook server listening on :3000")
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	// Register webhook HTTP handlers
+	mqttclient.RegisterEventHandlers()
 
+	// Start webhook server (blocking)
+	mqttclient.StartHTTPServer(":3000")
 }
-
-
-
-
