@@ -13,9 +13,6 @@ type MessagePayload struct {
 	Content string `json:"content"`
 }
 
-
-
-
 func main() {
 
 	ch,  rps:= rabbitmq.SetupRabbitMq()
@@ -35,3 +32,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":3000", nil))
 
 }
+
+
+
+

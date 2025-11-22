@@ -2,6 +2,8 @@ networks:
   app-network:
     driver: bridge
 
+
+
 services:
 
   rabbitmq:
