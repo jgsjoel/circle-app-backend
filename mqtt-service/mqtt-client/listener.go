@@ -19,37 +19,34 @@ type Listener struct{
 }
 
 func (l *Listener)subToIncommingMessages(){
-    token := l.client.Subscribe(IncommingMessages, 0, func(_ mqtt.Client, msg mqtt.Message) {
-		fmt.Println("New incoming message:", string(msg.Payload()))
-
-		var message MessageDto
-		err := json.Unmarshal(msg.Payload(), &message)
-		if err != nil {
-			fmt.Println("❌ Failed to parse incoming message:", err)
-			return
-		}
-
-		l.publisher.Send(rabbitmq.MessageExchange, rabbitmq.MessageProcessQueue, message)
-
-		fmt.Printf("✅ Parsed MessageDto: %+v\n", message)
-	})
-	token.Wait()
+    go func() {
+        token := l.client.Subscribe(IncommingMessages, 0, func(_ mqtt.Client, msg mqtt.Message) {
+            fmt.Println("New incoming message:", string(msg.Payload()))
+            var message MessageDto
+            if err := json.Unmarshal(msg.Payload(), &message); err != nil {
+                fmt.Println("❌ Failed to parse incoming message:", err)
+                return
+            }
+            l.publisher.Send(rabbitmq.MessageExchange, rabbitmq.MessageProcessQueue, message)
+            fmt.Printf("✅ Parsed MessageDto: %+v\n", message)
+        })
+        token.Wait()
+    }()
 }
 
 func (l *Listener)subToIncommingstatusUpdates(){
-    token := l.client.Subscribe(StatusUpdate, 0, func(_ mqtt.Client, msg mqtt.Message) {
-		fmt.Println("New status update:", string(msg.Payload()))
-
-		var statusUpdate StatusDto
-		err := json.Unmarshal(msg.Payload(), &statusUpdate)
-		if err != nil {
-			fmt.Println("❌ Failed to parse status update:", err)
-			return
-		}
-
-		l.publisher.Send(rabbitmq.MessageExchange, rabbitmq.MessageStatusProcessQueue, statusUpdate)
-	})
-	token.Wait()
+    go func() {
+        token := l.client.Subscribe(StatusUpdate, 0, func(_ mqtt.Client, msg mqtt.Message) {
+            fmt.Println("New status update:", string(msg.Payload()))
+            var statusUpdate StatusDto
+            if err := json.Unmarshal(msg.Payload(), &statusUpdate); err != nil {
+                fmt.Println("❌ Failed to parse status update:", err)
+                return
+            }
+            l.publisher.Send(rabbitmq.MessageExchange, rabbitmq.MessageStatusProcessQueue, statusUpdate)
+        })
+        token.Wait()
+    }()
 }
 
 
