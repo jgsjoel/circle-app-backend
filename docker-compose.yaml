@@ -30,9 +30,9 @@ services:
 
 
   #### MQTT BROKER ####
-  emqx:
+  emqx-service:
     image: emqx/emqx:latest
-    container_name: emqx
+    container_name: emqx-service
     restart: always
     ports:
       - "1883:1883"
