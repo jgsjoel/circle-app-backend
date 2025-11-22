@@ -27,7 +27,7 @@ const (
 	RoutingKeyUndeliveredResponse   = "undelivered.response"
 	RoutingKeyMessageStatusResponse = "msgstat.response"
 
-	Address = "amqp://guest:guest@localhost:5672/"
+	Address = "amqp://myuser:secret@rabbitmq:5672/"
 )
 
 func failOnError(err error, msg string) {
