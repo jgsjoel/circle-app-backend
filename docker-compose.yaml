@@ -214,21 +214,21 @@ services:
     env_file:
       - .env
 
-  websocket-service:
-    image: joelgallan/websocket-service:latest
-    container_name: websocket-service
-    restart: always
-    depends_on:
-      redis-service:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    ports:
-      - "8082:8082"
-    networks:
-      - app-network
-    env_file:
-      - .env
+#  websocket-service:
+#    image: joelgallan/websocket-service:latest
+#    container_name: websocket-service
+#    restart: always
+#    depends_on:
+#      redis-service:
+#        condition: service_healthy
+#      rabbitmq:
+#        condition: service_healthy
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - app-network
+#    env_file:
+#      - .env
 
   message-service:
     image: joelgallan/message-service:latest
