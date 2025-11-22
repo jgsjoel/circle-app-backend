@@ -45,7 +45,7 @@ public class RabbitConsumerService {
         Message firebaseMsg = Message.builder()
                 .setToken(fcmToken)
                 .setNotification(Notification.builder()
-                        .setTitle("Hello")
+                        .setTitle(message.getPayload().getContent().)
                         .setBody("You have a new message!")
                         .build())
                 .putData("payload", payloadJson) // optional extra data
