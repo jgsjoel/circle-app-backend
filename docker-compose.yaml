@@ -45,10 +45,10 @@ services:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:18083/status || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:18083/status || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
 
   #### databases ####

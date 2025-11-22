@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	Broker = "tcp://localhost:1883"
+	Broker = "tcp://emqx-service:1883"
 	ClientID = "go_mqtt_client"
 )
 
