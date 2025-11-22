@@ -15,6 +15,7 @@ type MessagePayload struct {
 
 
 
+
 func main() {
 
 	ch,  rps:= rabbitmq.SetupRabbitMq()

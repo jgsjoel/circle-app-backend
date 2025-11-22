@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN go build -o mqtt-service ./cmd/main.go  # adjust main.go path
+RUN go build -o mqtt-service ./main.go
 
 # Final stage
 FROM alpine:latest
