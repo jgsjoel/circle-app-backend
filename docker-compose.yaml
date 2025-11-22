@@ -35,21 +35,21 @@ services:
     container_name: emqx
     restart: always
     ports:
-      - "1883:1883"     # MQTT TCP
-      - "18083:18083"   # Dashboard
-      - "8083:8083"     # MQTT WebSocket
+      - "1883:1883"
+      - "18083:18083"
+      - "8083:8083"
     environment:
-      EMQX_NODE__NAME: emqx@127.0.0.1
-      EMQX_ALLOW_ANONYMOUS: "true"   # Optional for local testing
-      EMQX_DASHBOARD__DEFAULT_PASSWORD: "admin123" # Dashboard login
+      EMQX_ALLOW_ANONYMOUS: "true"
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: "admin123"
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:18083/status" ]
-      interval: 5s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:18083/status || exit 1" ]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+
 
   #### databases ####
 
