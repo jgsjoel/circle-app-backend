@@ -48,7 +48,9 @@ services:
       test: [ "CMD-SHELL", "curl -f http://localhost:18083/status || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 20
+    networks: # <<< THIS MAKES SURE IT JOINS THE NETWORK
+      - app-network
 
 
   #### databases ####
@@ -278,6 +280,7 @@ services:
     image: joelgallan/mqtt-service:latest
     container_name: mqtt-service
     restart: always
+    entrypoint: [ "/wait-for-emqx.sh", "emqx-service", "your-original-cmd" ]
     depends_on:
       redis-service:
         condition: service_healthy
