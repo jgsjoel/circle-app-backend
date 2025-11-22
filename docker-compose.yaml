@@ -280,7 +280,7 @@ services:
     image: joelgallan/mqtt-service:latest
     container_name: mqtt-service
     restart: always
-    entrypoint: [ "/wait-for-emqx.sh", "emqx-service", "your-original-cmd" ]
+#    entrypoint: [ "/wait-for-emqx.sh", "emqx-service", "your-original-cmd" ]
     depends_on:
       redis-service:
         condition: service_healthy
