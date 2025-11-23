@@ -32,16 +32,16 @@ jobs:
         run: docker push joelgallan/user-service:latest
 
       # 5. Deploy user service on VPS
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd ~/apps/circle-app
-            docker compose stop user-service
-            docker compose rm -f user-service
-            docker compose pull user-service
-            docker compose up -d user-service
-            docker image prune -f || echo "Prune skipped"
+#      - name: Deploy to VPS
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.VPS_HOST }}
+#          username: ${{ secrets.VPS_USER }}
+#          key: ${{ secrets.VPS_SSH_KEY }}
+#          script: |
+#            cd ~/apps/circle-app
+#            docker compose stop user-service
+#            docker compose rm -f user-service
+#            docker compose pull user-service
+#            docker compose up -d user-service
+#            docker image prune -f || echo "Prune skipped"

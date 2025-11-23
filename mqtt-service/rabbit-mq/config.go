@@ -64,7 +64,7 @@ func DeclareExchange(ch *amqp091.Channel, exchangeName string) {
 func QueueDeclare(ch *amqp091.Channel, queueName string) {
 	_, err := ch.QueueDeclare(
 		queueName, // name
-		true,      // durable
+		false,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait

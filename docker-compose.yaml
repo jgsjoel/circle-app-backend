@@ -2,8 +2,6 @@ networks:
   app-network:
     driver: bridge
 
-
-
 services:
 
   rabbitmq:
@@ -177,7 +175,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
     depends_on:
       redis-service:
         condition: service_healthy
@@ -196,7 +194,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
 
   user-service:
@@ -214,7 +212,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
 #  websocket-service:
 #    image: joelgallan/websocket-service:latest
@@ -246,7 +244,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
   chat-service:
     image: joelgallan/chat-service:latest
@@ -260,7 +258,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
   fcm-service:
     image: joelgallan/fcm-service:latest
@@ -274,7 +272,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
   mqtt-service:
     image: joelgallan/mqtt-service:latest
@@ -291,7 +289,7 @@ services:
     networks:
       - app-network
     env_file:
-      - .env
+      - stack.env
 
 
 volumes:

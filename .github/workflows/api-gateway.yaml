@@ -32,16 +32,16 @@ jobs:
         run: docker push joelgallan/api-gateway:latest
 
       # 5. Deploy API Gateway on VPS
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd ~/apps/circle-app
-            docker compose stop api-gateway
-            docker compose rm -f api-gateway
-            docker compose pull api-gateway
-            docker compose up -d api-gateway
-            docker image prune -f || echo "Prune skipped"
+#      - name: Deploy to VPS
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.VPS_HOST }}
+#          username: ${{ secrets.VPS_USER }}
+#          key: ${{ secrets.VPS_SSH_KEY }}
+#          script: |
+#            cd ~/apps/circle-app
+#            docker compose stop api-gateway
+#            docker compose rm -f api-gateway
+#            docker compose pull api-gateway
+#            docker compose up -d api-gateway
+#            docker image prune -f || echo "Prune skipped"
