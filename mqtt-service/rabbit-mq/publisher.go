@@ -29,7 +29,7 @@ func (ps *PublisherService)Send(exchange, routingKey string, pl interface{}) err
 		false,      // mandatory
 		false,      // immediate
 		amqp091.Publishing{
-			ContentType: "text/plain",
+			ContentType: "application/json",
 			Body:        body,
 		})
 	failOnError(err, "Failed to publish a message")
