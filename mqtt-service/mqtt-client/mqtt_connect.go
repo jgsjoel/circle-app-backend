@@ -20,8 +20,5 @@ func NewMQTTClient() mqtt.Client{
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-
-
-	
 	return client
 }
