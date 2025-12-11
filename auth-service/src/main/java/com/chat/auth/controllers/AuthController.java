@@ -1,5 +1,6 @@
 package com.chat.auth.controllers;
 
+import com.chat.auth.dtos.MqttAuthDto;
 import com.chat.auth.dtos.RequestDto;
 import com.chat.auth.dtos.UserDto;
 import com.chat.auth.groups.Request;
@@ -63,7 +64,14 @@ public class AuthController {
         return new ResponseEntity<Map<String,String>>(Map.of("token",token),HttpStatus.OK);
     }
 
-
+    @PostMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestBody MqttAuthDto authDto) {
+        boolean isValid = jwtUtil.validateToken(authDto.getPassword());
+        if (!isValid) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+        return ResponseEntity.ok("Token is valid");
+    }
 
 }
 
