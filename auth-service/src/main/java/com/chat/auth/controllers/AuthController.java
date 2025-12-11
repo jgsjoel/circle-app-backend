@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -65,13 +66,22 @@ public class AuthController {
     }
 
     @PostMapping("/validate-token")
-    public ResponseEntity<?> validateToken(@RequestBody MqttAuthDto authDto) {
+    public ResponseEntity<Map<String, String>> validateToken(@RequestBody MqttAuthDto authDto) {
+
         boolean isValid = jwtUtil.validateToken(authDto.getPassword());
+
+        Map<String, String> response = new HashMap<>();
+
         if (!isValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            response.put("result", "deny");
+            return ResponseEntity.ok(response);   // EMQX expects 200 even for deny
         }
-        return ResponseEntity.ok("Token is valid");
+
+        // Token valid → allow
+        response.put("result", "allow");
+        return ResponseEntity.ok(response);
     }
+
 
 }
 
