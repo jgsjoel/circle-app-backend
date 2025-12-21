@@ -74,7 +74,7 @@ public class AuthController {
 
         if (!isValid) {
             response.put("result", "deny");
-            return ResponseEntity.ok(response);   // EMQX expects 200 even for deny
+            return ResponseEntity.ok(response);
         }
 
         // Token valid → allow
