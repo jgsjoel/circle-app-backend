@@ -68,6 +68,8 @@ public class AuthController {
     @PostMapping("/validate-token")
     public ResponseEntity<Map<String, String>> validateToken(@RequestBody MqttAuthDto authDto) {
 
+        System.out.println("Validating token: " + authDto.getPassword());
+
         boolean isValid = jwtUtil.validateToken(authDto.getPassword());
 
         Map<String, String> response = new HashMap<>();
